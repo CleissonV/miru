@@ -8,7 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getMediaDetail } from '@/api/media'
 import { listEntries, createEntry, updateEntry, deleteEntry } from '@/api/entries'
 import { useAuthStore } from '@/stores/authStore'
-import { STATUS_LABEL, MEDIA_LABEL, type WatchStatus } from '@/types'
+import { type WatchStatus } from '@/types'
+import { useT, useStatusLabel, useMediaLabel } from '@/i18n/translations'
 import { COLORS } from '@/lib/constants'
 import { useEffect } from 'react'
 
@@ -28,6 +29,9 @@ export default function MediaDetailScreen() {
   const qc = useQueryClient()
   const [modalVisible, setModalVisible] = useState(false)
   const language = useAuthStore(s => s.user?.language)
+  const t = useT()
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
 
   const { data: media, isLoading } = useQuery({
     queryKey: ['media', type, Number(id), language],
@@ -63,7 +67,7 @@ export default function MediaDetailScreen() {
       qc.invalidateQueries({ queryKey: ['entries'] })
       setModalVisible(false)
     },
-    onError: () => Alert.alert('Erro', 'Não foi possível salvar'),
+    onError: () => Alert.alert(t('detail_save_error_title'), t('detail_save_error_msg')),
   })
 
   const remove = useMutation({
@@ -117,7 +121,7 @@ export default function MediaDetailScreen() {
             )}
             {media.episodes && (
               <View style={s.metaItem}>
-                <Text style={s.metaText}>{media.episodes} eps</Text>
+                <Text style={s.metaText}>{media.episodes} {t('detail_episodes_suffix')}</Text>
               </View>
             )}
           </View>
@@ -137,7 +141,7 @@ export default function MediaDetailScreen() {
           {media.overview ? (
             <>
               {(media.type === 'ANIME' || media.type === 'MANGA') && (
-                <Text style={s.langNote}>ℹ️ Sinopse disponível apenas em inglês (fonte: MyAnimeList).</Text>
+                <Text style={s.langNote}>{t('detail_lang_note')}</Text>
               )}
               <Text style={s.overview}>{media.overview}</Text>
             </>
@@ -146,7 +150,7 @@ export default function MediaDetailScreen() {
           {/* Current status if in list */}
           {existingEntry && (
             <View style={[s.statusBanner, { borderColor: STATUS_COLORS[existingEntry.status] + '44' }]}>
-              <Text style={s.statusBannerLabel}>Na sua lista</Text>
+              <Text style={s.statusBannerLabel}>{t('detail_in_list')}</Text>
               <Text style={[s.statusBannerStatus, { color: STATUS_COLORS[existingEntry.status] }]}>
                 {STATUS_LABEL[existingEntry.status]}
               </Text>
@@ -156,7 +160,7 @@ export default function MediaDetailScreen() {
           {/* Add / Update button */}
           <Pressable style={s.actionBtn} onPress={() => setModalVisible(true)}>
             <Text style={s.actionBtnText}>
-              {existingEntry ? 'Atualizar na lista' : '+ Adicionar à lista'}
+              {existingEntry ? t('detail_update_in_list') : t('detail_add_to_list')}
             </Text>
           </Pressable>
         </View>
@@ -171,7 +175,7 @@ export default function MediaDetailScreen() {
       >
         <Pressable style={s.modalBg} onPress={() => setModalVisible(false)}>
           <View style={s.modalSheet}>
-            <Text style={s.modalTitle}>Escolher status</Text>
+            <Text style={s.modalTitle}>{t('detail_choose_status')}</Text>
 
             {STATUSES.map(status => (
               <Pressable
@@ -197,14 +201,14 @@ export default function MediaDetailScreen() {
                 <Pressable
                   style={s.removeBtn}
                   onPress={() => {
-                    Alert.alert('Remover', 'Remover da lista?', [
-                      { text: 'Cancelar', style: 'cancel' },
-                      { text: 'Remover', style: 'destructive', onPress: () => remove.mutate() },
+                    Alert.alert(t('detail_remove_confirm_title'), t('detail_remove_confirm_msg'), [
+                      { text: t('cancel'), style: 'cancel' },
+                      { text: t('detail_remove'), style: 'destructive', onPress: () => remove.mutate() },
                     ])
                   }}
                   disabled={remove.isPending}
                 >
-                  <Text style={s.removeBtnText}>Remover da lista</Text>
+                  <Text style={s.removeBtnText}>{t('detail_remove_from_list')}</Text>
                 </Pressable>
               </>
             )}

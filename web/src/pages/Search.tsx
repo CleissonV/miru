@@ -7,17 +7,9 @@ import MediaCard from '@/components/MediaCard'
 import { PosterSkeleton } from '@/components/ui/Skeleton'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useAuthStore } from '@/stores/authStore'
+import { useT } from '@/i18n/translations'
 import type { MediaType } from '@/types'
 import { cn } from '@/lib/utils'
-
-const TYPES: { label: string; value: MediaType | undefined }[] = [
-  { label: 'Tudo', value: undefined },
-  { label: 'Filmes', value: 'MOVIE' },
-  { label: 'Séries', value: 'SERIES' },
-  { label: 'Animes', value: 'ANIME' },
-  { label: 'Doramas', value: 'DORAMA' },
-  { label: 'Mangás', value: 'MANGA' },
-]
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -28,6 +20,16 @@ export default function Search() {
 
   const debounced = useDebounce(query)
   const language = useAuthStore(s => s.user?.language)
+  const t = useT()
+
+  const TYPES: { label: string; value: MediaType | undefined }[] = [
+    { label: t('filter_all'), value: undefined },
+    { label: t('filter_movies'), value: 'MOVIE' },
+    { label: t('filter_series'), value: 'SERIES' },
+    { label: t('filter_anime'), value: 'ANIME' },
+    { label: t('filter_dorama'), value: 'DORAMA' },
+    { label: t('filter_manga'), value: 'MANGA' },
+  ]
 
   useEffect(() => {
     const params: Record<string, string> = {}
@@ -46,7 +48,7 @@ export default function Search() {
 
   return (
     <main className="px-8 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-text">Buscar</h1>
+      <h1 className="mb-6 text-2xl font-bold text-text">{t('search_title')}</h1>
 
       <div className="relative mb-5">
         <SearchIcon
@@ -57,7 +59,7 @@ export default function Search() {
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Buscar filme, série ou anime..."
+          placeholder={t('search_placeholder')}
           className="w-full rounded-2xl border border-border bg-surface py-3.5 pl-11 pr-4 text-sm text-text placeholder-text-muted outline-none transition-colors focus:border-brand-purple focus:ring-1 focus:ring-brand-purple/50"
           autoFocus
         />
@@ -83,7 +85,7 @@ export default function Search() {
       {!debounced || debounced.length < 2 ? (
         <div className="py-24 text-center">
           <SearchIcon size={48} className="mx-auto mb-4 text-text-subtle opacity-40" />
-          <p className="text-text-muted">Digite pelo menos 2 caracteres para buscar</p>
+          <p className="text-text-muted">{t('search_min_chars')}</p>
         </div>
       ) : loading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
@@ -92,7 +94,7 @@ export default function Search() {
       ) : !data?.length ? (
         <div className="py-24 text-center">
           <p className="text-text-muted">
-            Nenhum resultado para{' '}
+            {t('search_no_results')}{' '}
             <strong className="text-text">"{debounced}"</strong>
           </p>
         </div>

@@ -7,26 +7,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { listEntries, deleteEntry } from '@/api/entries'
 import { getMediaDetail } from '@/api/media'
-import { MEDIA_LABEL, STATUS_LABEL, type WatchStatus, type MediaType, type Entry } from '@/types'
+import { type WatchStatus, type MediaType, type Entry } from '@/types'
+import { useT, useStatusLabel, useMediaLabel } from '@/i18n/translations'
 import { COLORS } from '@/lib/constants'
-
-const STATUS_FILTERS: { label: string; value: WatchStatus | undefined; color: string }[] = [
-  { label: 'Todos', value: undefined, color: COLORS.muted },
-  { label: 'Assistindo', value: 'WATCHING', color: COLORS.accent },
-  { label: 'Concluídos', value: 'COMPLETED', color: COLORS.green },
-  { label: 'Planejados', value: 'PLAN_TO_WATCH', color: COLORS.blue },
-  { label: 'Em Pausa', value: 'ON_HOLD', color: COLORS.yellow },
-  { label: 'Abandonados', value: 'DROPPED', color: COLORS.red },
-]
-
-const TYPE_FILTERS: { label: string; value: MediaType | undefined }[] = [
-  { label: 'Tudo', value: undefined },
-  { label: 'Filmes', value: 'MOVIE' },
-  { label: 'Séries', value: 'SERIES' },
-  { label: 'Animes', value: 'ANIME' },
-  { label: 'Doramas', value: 'DORAMA' },
-  { label: 'Mangás', value: 'MANGA' },
-]
 
 const STATUS_COLOR: Record<WatchStatus, string> = {
   WATCHING: COLORS.accent,
@@ -41,6 +24,27 @@ export default function ListScreen() {
   const [mediaType, setMediaType] = useState<MediaType | undefined>()
   const qc = useQueryClient()
   const router = useRouter()
+  const t = useT()
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
+
+  const STATUS_FILTERS: { label: string; value: WatchStatus | undefined; color: string }[] = [
+    { label: t('status_all'), value: undefined, color: COLORS.muted },
+    { label: STATUS_LABEL.WATCHING, value: 'WATCHING', color: COLORS.accent },
+    { label: STATUS_LABEL.COMPLETED, value: 'COMPLETED', color: COLORS.green },
+    { label: STATUS_LABEL.PLAN_TO_WATCH, value: 'PLAN_TO_WATCH', color: COLORS.blue },
+    { label: STATUS_LABEL.ON_HOLD, value: 'ON_HOLD', color: COLORS.yellow },
+    { label: STATUS_LABEL.DROPPED, value: 'DROPPED', color: COLORS.red },
+  ]
+
+  const TYPE_FILTERS: { label: string; value: MediaType | undefined }[] = [
+    { label: t('filter_all'), value: undefined },
+    { label: t('filter_movies'), value: 'MOVIE' },
+    { label: t('filter_series'), value: 'SERIES' },
+    { label: t('filter_anime'), value: 'ANIME' },
+    { label: t('filter_dorama'), value: 'DORAMA' },
+    { label: t('filter_manga'), value: 'MANGA' },
+  ]
 
   const { data, isLoading } = useQuery({
     queryKey: ['entries', status, mediaType],
@@ -97,7 +101,7 @@ export default function ListScreen() {
       {/* Count */}
       {data && (
         <Text style={s.count}>
-          {data.pagination.total} {data.pagination.total === 1 ? 'título' : 'títulos'}
+          {data.pagination.total} {data.pagination.total === 1 ? t('list_count_one') : t('list_count_many')}
         </Text>
       )}
 
@@ -106,9 +110,9 @@ export default function ListScreen() {
       ) : !data?.entries.length ? (
         <View style={s.empty}>
           <Text style={s.emptyEmoji}>見</Text>
-          <Text style={s.emptyText}>Sua lista está vazia</Text>
+          <Text style={s.emptyText}>{t('list_empty')}</Text>
           <Pressable style={s.emptyBtn} onPress={() => router.push('/(tabs)/search')}>
-            <Text style={s.emptyBtnText}>Buscar títulos</Text>
+            <Text style={s.emptyBtnText}>{t('list_search_cta')}</Text>
           </Pressable>
         </View>
       ) : (
@@ -143,6 +147,8 @@ function EntryCard({
     queryFn: () => getMediaDetail(entry.mediaType.toLowerCase(), entry.externalId),
     staleTime: 1000 * 60 * 60,
   })
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
 
   return (
     <Pressable style={s.card} onPress={onPress} onLongPress={onRemove}>

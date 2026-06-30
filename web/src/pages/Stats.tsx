@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import { getStats } from '@/api/entries'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { STATUS_LABEL, MEDIA_LABEL } from '@/types'
+import { useT, useStatusLabel, useMediaLabel } from '@/i18n/translations'
 
 const TYPE_COLORS = { MOVIE: '#818cf8', SERIES: '#f472b6', ANIME: '#60a5fa', DORAMA: '#fb7185', MANGA: '#fbbf24' }
 const STATUS_COLORS: Record<string, string> = {
@@ -28,6 +28,9 @@ export default function Stats() {
     queryKey: ['stats'],
     queryFn: getStats,
   })
+  const t = useT()
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
 
   if (isLoading) return <StatsSkeleton />
   if (!data) return null
@@ -48,11 +51,11 @@ export default function Stats() {
 
   return (
     <main className="px-8 py-8">
-      <h1 className="mb-8 text-2xl font-bold text-text">Estatísticas</h1>
+      <h1 className="mb-8 text-2xl font-bold text-text">{t('stats_title')}</h1>
 
       {/* Summary cards */}
       <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard label="Total" value={data.total} gradient="from-brand-purple to-brand-pink" />
+        <StatCard label={t('stats_total')} value={data.total} gradient="from-brand-purple to-brand-pink" />
         {Object.entries(data.byType).map(([type, v]) => (
           <StatCard
             key={type}
@@ -66,12 +69,12 @@ export default function Stats() {
 
       {data.total === 0 ? (
         <div className="py-24 text-center text-text-muted">
-          <p className="text-lg">Sua lista está vazia</p>
-          <p className="mt-1 text-sm">Adicione títulos para ver estatísticas aqui</p>
+          <p className="text-lg">{t('stats_empty')}</p>
+          <p className="mt-1 text-sm">{t('stats_empty_sub')}</p>
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
-          <ChartCard title="Por tipo">
+          <ChartCard title={t('stats_by_type')}>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie
@@ -100,7 +103,7 @@ export default function Stats() {
             </div>
           </ChartCard>
 
-          <ChartCard title="Por status">
+          <ChartCard title={t('stats_by_status')}>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={statusData} barSize={26}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" vertical={false} />

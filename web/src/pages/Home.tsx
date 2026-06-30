@@ -5,7 +5,8 @@ import { TrendingUp, ChevronRight, Star, Play } from 'lucide-react'
 import { getTrending } from '@/api/media'
 import { useAuthStore } from '@/stores/authStore'
 import { formatScore } from '@/lib/utils'
-import { MEDIA_LABEL, type MediaResult } from '@/types'
+import { useT, useMediaLabel } from '@/i18n/translations'
+import type { MediaResult } from '@/types'
 
 const SECTION_COLORS = {
   movie: 'from-brand-purple to-brand-pink',
@@ -17,6 +18,8 @@ const SECTION_COLORS = {
 
 export default function Home() {
   const { isAuthenticated, user } = useAuthStore()
+  const t = useT()
+  const MEDIA_LABEL = useMediaLabel()
 
   const { data: trending } = useQuery({
     queryKey: ['trending', user?.language],
@@ -62,8 +65,8 @@ export default function Home() {
             transition={{ delay: 0.05 }}
             className="text-4xl font-bold leading-tight text-white drop-shadow-lg sm:text-5xl"
           >
-            Tudo que você assiste,{' '}
-            <span className="text-brand-pink drop-shadow-[0_0_20px_rgba(244,114,182,0.6)]">em um só lugar</span>
+            {t('home_hero_title_1')}{' '}
+            <span className="text-brand-pink drop-shadow-[0_0_20px_rgba(244,114,182,0.6)]">{t('home_hero_title_2')}</span>
           </motion.h1>
 
           <motion.p
@@ -72,7 +75,7 @@ export default function Home() {
             transition={{ delay: 0.1 }}
             className="mt-3 max-w-xl text-base text-text-muted"
           >
-            Filmes, séries, animes, doramas e mangás. Acompanhe, avalie e descubra novos títulos.
+            {t('home_hero_subtitle')}
           </motion.p>
 
           <motion.div
@@ -87,14 +90,14 @@ export default function Home() {
                 className="flex items-center gap-2 rounded-xl bg-gradient-purple-pink px-6 py-3 text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90"
               >
                 <Play size={15} fill="white" />
-                Começar agora
+                {t('home_cta_start')}
               </Link>
             )}
             <Link
               to="/search"
               className="flex items-center gap-2 rounded-xl border border-border bg-surface/80 px-6 py-3 text-sm font-semibold text-text backdrop-blur-sm transition-colors hover:bg-surface-2"
             >
-              Explorar títulos
+              {t('home_cta_explore')}
             </Link>
           </motion.div>
         </div>
@@ -111,7 +114,7 @@ export default function Home() {
           <div className="mb-4 flex items-center gap-2">
             <TrendingUp size={16} className="text-brand-purple" />
             <span className="text-sm font-semibold uppercase tracking-wider text-text-muted">
-              Em destaque
+              {t('home_featured')}
             </span>
           </div>
           <Link to={`/media/${hero.type.toLowerCase()}/${hero.id}`}>
@@ -156,31 +159,31 @@ export default function Home() {
       {[
         {
           key: 'movies',
-          label: 'Filmes em Alta',
+          label: t('home_section_movies'),
           items: trending?.movies.slice(hero?.type === 'MOVIE' ? 1 : 0),
           gradient: SECTION_COLORS.movie,
         },
         {
           key: 'series',
-          label: 'Séries em Alta',
+          label: t('home_section_series'),
           items: trending?.series,
           gradient: SECTION_COLORS.series,
         },
         {
           key: 'anime',
-          label: 'Animes Populares',
+          label: t('home_section_anime'),
           items: trending?.anime,
           gradient: SECTION_COLORS.anime,
         },
         {
           key: 'dorama',
-          label: 'Doramas em Alta',
+          label: t('home_section_dorama'),
           items: trending?.doramas,
           gradient: SECTION_COLORS.dorama,
         },
         {
           key: 'manga',
-          label: 'Mangás Populares',
+          label: t('home_section_manga'),
           items: trending?.manga,
           gradient: SECTION_COLORS.manga,
         },
@@ -202,6 +205,7 @@ function TrendingRow({
   items?: MediaResult[]
   gradient: string
 }) {
+  const t = useT()
   return (
     <section className="px-8 py-4">
       <div className="mb-4 flex items-center justify-between">
@@ -213,7 +217,7 @@ function TrendingRow({
           to="/search"
           className="flex items-center gap-1 text-xs font-medium text-text-muted transition-colors hover:text-brand-purple"
         >
-          Ver mais <ChevronRight size={13} />
+          {t('see_more')} <ChevronRight size={13} />
         </Link>
       </div>
 

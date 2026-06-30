@@ -6,7 +6,8 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { Badge } from '@/components/ui/Badge'
 import { getInitials } from '@/lib/utils'
 import { useAuthStore } from '@/stores/authStore'
-import { MEDIA_LABEL, STATUS_LABEL, STATUS_COLOR, type Entry, type Language } from '@/types'
+import { STATUS_COLOR, type Entry, type Language } from '@/types'
+import { useT, useStatusLabel, useMediaLabel } from '@/i18n/translations'
 import { cn } from '@/lib/utils'
 
 export default function Profile() {
@@ -14,6 +15,9 @@ export default function Profile() {
   const { user: loggedUser, setUser } = useAuthStore()
   const isOwnProfile = loggedUser?.username === username
   const qc = useQueryClient()
+  const t = useT()
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
 
   const updateLanguage = useMutation({
     mutationFn: async (language: Language) => {
@@ -51,7 +55,7 @@ export default function Profile() {
   if (error) {
     return (
       <div className="px-8 py-24 text-center">
-        <p className="text-text-muted">Perfil não encontrado</p>
+        <p className="text-text-muted">{t('profile_not_found')}</p>
       </div>
     )
   }
@@ -90,8 +94,8 @@ export default function Profile() {
             <p className="mt-2 max-w-md text-sm text-text-muted">{profile.bio}</p>
           )}
           <p className="mt-2 text-xs text-text-subtle">
-            Membro desde{' '}
-            {new Date(profile.createdAt).toLocaleDateString('pt-BR', {
+            {t('profile_member_since')}{' '}
+            {new Date(profile.createdAt).toLocaleDateString(loggedUser?.language === 'en' ? 'en-US' : 'pt-BR', {
               month: 'long',
               year: 'numeric',
             })}
@@ -104,7 +108,7 @@ export default function Profile() {
         <div className="mb-10 rounded-2xl border border-border bg-surface p-4">
           <div className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-text-muted">
             <Globe size={12} />
-            Idioma das descrições
+            {t('profile_language_label')}
           </div>
           <div className="flex gap-2">
             {([
@@ -127,7 +131,7 @@ export default function Profile() {
             ))}
           </div>
           <p className="mt-2.5 text-xs text-text-subtle">
-            Vale para filmes, séries e doramas. Animes e mangás (MyAnimeList) ficam sempre em inglês.
+            {t('profile_language_hint')}
           </p>
         </div>
       )}
@@ -136,7 +140,7 @@ export default function Profile() {
       {byStatus && Object.keys(byStatus).length > 0 && (
         <div className="mb-10">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-muted">
-            Resumo
+            {t('profile_summary')}
           </h2>
           <div className="flex flex-wrap gap-3">
             {Object.entries(byStatus).map(([status, count]) => (
@@ -158,7 +162,7 @@ export default function Profile() {
       {entries && entries.length > 0 && (
         <section>
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-text-muted">
-            Atividade recente
+            {t('profile_recent_activity')}
           </h2>
           <div className="space-y-2">
             {entries.slice(0, 20).map(entry => (

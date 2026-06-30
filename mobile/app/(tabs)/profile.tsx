@@ -5,12 +5,14 @@ import { Globe } from 'lucide-react-native'
 import { useAuthStore, type Language } from '@/stores/authStore'
 import { logout } from '@/api/auth'
 import { api } from '@/api/client'
+import { useT } from '@/i18n/translations'
 import { COLORS } from '@/lib/constants'
 
 export default function ProfileScreen() {
   const { user, clearUser, setUser } = useAuthStore()
   const router = useRouter()
   const qc = useQueryClient()
+  const t = useT()
 
   const updateLanguage = useMutation({
     mutationFn: async (language: Language) => {
@@ -26,10 +28,10 @@ export default function ProfileScreen() {
   })
 
   async function handleLogout() {
-    Alert.alert('Sair', 'Tem certeza que deseja sair?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('profile_logout_confirm_title'), t('profile_logout_confirm_msg'), [
+      { text: t('cancel'), style: 'cancel' },
       {
-        text: 'Sair',
+        text: t('profile_logout_confirm_title'),
         style: 'destructive',
         onPress: async () => {
           await logout()
@@ -63,15 +65,15 @@ export default function ProfileScreen() {
       <View style={s.divider} />
 
       <View style={s.infoCard}>
-        <InfoRow label="Nome de usuário" value={`@${user.username}`} />
-        <InfoRow label="E-mail" value={user.email} />
-        {user.displayName && <InfoRow label="Nome" value={user.displayName} />}
+        <InfoRow label={t('profile_username')} value={`@${user.username}`} />
+        <InfoRow label={t('profile_email')} value={user.email} />
+        {user.displayName && <InfoRow label={t('profile_name')} value={user.displayName} />}
       </View>
 
       <View style={s.langCard}>
         <View style={s.langHeader}>
           <Globe size={12} color={COLORS.muted} />
-          <Text style={s.langHeaderText}>IDIOMA DAS DESCRIÇÕES</Text>
+          <Text style={s.langHeaderText}>{t('profile_language_label')}</Text>
         </View>
         <View style={s.langButtons}>
           {([
@@ -92,12 +94,12 @@ export default function ProfileScreen() {
           })}
         </View>
         <Text style={s.langHint}>
-          Vale para filmes, séries e doramas. Animes e mangás ficam sempre em inglês.
+          {t('profile_language_hint')}
         </Text>
       </View>
 
       <Pressable style={s.logoutBtn} onPress={handleLogout}>
-        <Text style={s.logoutText}>Sair da conta</Text>
+        <Text style={s.logoutText}>{t('profile_logout')}</Text>
       </Pressable>
     </ScrollView>
   )

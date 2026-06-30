@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom'
 import { Star } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { MediaResult } from '@/types'
-import { MEDIA_LABEL, STATUS_LABEL, type WatchStatus } from '@/types'
+import { type WatchStatus } from '@/types'
+import { useMediaLabel, useStatusLabel } from '@/i18n/translations'
 import { formatScore, cn } from '@/lib/utils'
 
 interface Props {
@@ -13,6 +14,8 @@ interface Props {
 
 export default function MediaCard({ media, index = 0, entryStatus }: Props) {
   const href = `/media/${media.type.toLowerCase()}/${media.id}`
+  const MEDIA_LABEL = useMediaLabel()
+  const STATUS_LABEL = useStatusLabel()
 
   return (
     <motion.div

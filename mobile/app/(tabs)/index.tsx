@@ -3,33 +3,35 @@ import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { getTrending } from '@/api/media'
 import { useAuthStore } from '@/stores/authStore'
+import { useT } from '@/i18n/translations'
 import type { MediaResult } from '@/types'
 import { COLORS } from '@/lib/constants'
 
-const SECTIONS = [
-  { key: 'movies' as const, label: 'Filmes em Alta', accent: COLORS.accent },
-  { key: 'series' as const, label: 'Séries em Alta', accent: COLORS.pink },
-  { key: 'anime' as const, label: 'Animes Populares', accent: COLORS.blue },
-  { key: 'doramas' as const, label: 'Doramas em Alta', accent: '#fb7185' },
-  { key: 'manga' as const, label: 'Mangás Populares', accent: '#fbbf24' },
-]
-
 export default function HomeScreen() {
   const user = useAuthStore(s => s.user)
+  const t = useT()
   const { data, isLoading } = useQuery({
     queryKey: ['trending', user?.language],
     queryFn: getTrending,
     staleTime: 1000 * 60 * 10,
   })
 
+  const SECTIONS = [
+    { key: 'movies' as const, label: t('home_section_movies'), accent: COLORS.accent },
+    { key: 'series' as const, label: t('home_section_series'), accent: COLORS.pink },
+    { key: 'anime' as const, label: t('home_section_anime'), accent: COLORS.blue },
+    { key: 'doramas' as const, label: t('home_section_dorama'), accent: '#fb7185' },
+    { key: 'manga' as const, label: t('home_section_manga'), accent: '#fbbf24' },
+  ]
+
   return (
     <ScrollView style={s.root} showsVerticalScrollIndicator={false}>
       <View style={s.header}>
         <Text style={s.greeting}>
-          {user ? `Olá, ${user.displayName ?? user.username} 👋` : 'Olá 👋'}
+          {user ? `${t('home_greeting')}, ${user.displayName ?? user.username} 👋` : `${t('home_greeting')} 👋`}
         </Text>
         <Text style={s.title}>Miru</Text>
-        <Text style={s.subtitle}>Filmes, séries, animes, doramas e mangás</Text>
+        <Text style={s.subtitle}>{t('home_subtitle')}</Text>
       </View>
 
       {isLoading && (

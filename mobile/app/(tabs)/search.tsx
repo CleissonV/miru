@@ -7,18 +7,9 @@ import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { search } from '@/api/media'
 import { useAuthStore } from '@/stores/authStore'
+import { useT, useMediaLabel } from '@/i18n/translations'
 import type { MediaType, MediaResult } from '@/types'
-import { MEDIA_LABEL } from '@/types'
 import { COLORS } from '@/lib/constants'
-
-const TYPE_FILTERS: { label: string; value: MediaType | undefined }[] = [
-  { label: 'Tudo', value: undefined },
-  { label: 'Filmes', value: 'MOVIE' },
-  { label: 'Séries', value: 'SERIES' },
-  { label: 'Animes', value: 'ANIME' },
-  { label: 'Doramas', value: 'DORAMA' },
-  { label: 'Mangás', value: 'MANGA' },
-]
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('')
@@ -26,10 +17,20 @@ export default function SearchScreen() {
   const [activeType, setActiveType] = useState<MediaType | undefined>()
   const router = useRouter()
   const language = useAuthStore(s => s.user?.language)
+  const t = useT()
+
+  const TYPE_FILTERS: { label: string; value: MediaType | undefined }[] = [
+    { label: t('filter_all'), value: undefined },
+    { label: t('filter_movies'), value: 'MOVIE' },
+    { label: t('filter_series'), value: 'SERIES' },
+    { label: t('filter_anime'), value: 'ANIME' },
+    { label: t('filter_dorama'), value: 'DORAMA' },
+    { label: t('filter_manga'), value: 'MANGA' },
+  ]
 
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(query), 400)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setDebounced(query), 400)
+    return () => clearTimeout(timer)
   }, [query])
 
   const { data, isLoading, isFetching } = useQuery({
@@ -45,7 +46,7 @@ export default function SearchScreen() {
       <View style={s.searchBox}>
         <TextInput
           style={s.input}
-          placeholder="Buscar filme, série ou anime..."
+          placeholder={t('search_placeholder')}
           placeholderTextColor={COLORS.muted}
           value={query}
           onChangeText={setQuery}
@@ -75,7 +76,7 @@ export default function SearchScreen() {
       {debounced.length < 2 ? (
         <View style={s.empty}>
           <Text style={s.emptyEmoji}>🔍</Text>
-          <Text style={s.emptyText}>Digite pelo menos 2 caracteres</Text>
+          <Text style={s.emptyText}>{t('search_min_chars')}</Text>
         </View>
       ) : loading ? (
         <View style={s.empty}>
@@ -83,7 +84,7 @@ export default function SearchScreen() {
         </View>
       ) : !data?.length ? (
         <View style={s.empty}>
-          <Text style={s.emptyText}>Nenhum resultado para "{debounced}"</Text>
+          <Text style={s.emptyText}>{t('search_no_results')} "{debounced}"</Text>
         </View>
       ) : (
         <FlatList
@@ -102,6 +103,7 @@ export default function SearchScreen() {
 }
 
 function ResultCard({ item, onPress }: { item: MediaResult; onPress: () => void }) {
+  const MEDIA_LABEL = useMediaLabel()
   return (
     <Pressable style={s.card} onPress={onPress}>
       {item.poster

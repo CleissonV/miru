@@ -1,7 +1,8 @@
 import { ScrollView, View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import { useQuery } from '@tanstack/react-query'
 import { getStats } from '@/api/entries'
-import { MEDIA_LABEL, STATUS_LABEL, type MediaType, type WatchStatus } from '@/types'
+import { type MediaType, type WatchStatus } from '@/types'
+import { useT, useStatusLabel, useMediaLabel } from '@/i18n/translations'
 import { COLORS } from '@/lib/constants'
 
 const MEDIA_COLORS: Record<string, string> = {
@@ -25,6 +26,9 @@ export default function StatsScreen() {
     queryKey: ['stats'],
     queryFn: getStats,
   })
+  const t = useT()
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
 
   if (isLoading) {
     return (
@@ -42,10 +46,10 @@ export default function StatsScreen() {
     <ScrollView style={s.root} showsVerticalScrollIndicator={false}>
       <View style={s.heroCard}>
         <Text style={s.heroNum}>{total}</Text>
-        <Text style={s.heroLabel}>títulos na lista</Text>
+        <Text style={s.heroLabel}>{t('stats_total_titles')}</Text>
       </View>
 
-      <Text style={s.sectionTitle}>Por tipo de mídia</Text>
+      <Text style={s.sectionTitle}>{t('stats_by_type')}</Text>
       {(Object.entries(data.byType) as [MediaType, any][]).map(([type, stat]) => (
         <View key={type} style={s.statRow}>
           <View style={[s.dot, { backgroundColor: MEDIA_COLORS[type] ?? COLORS.muted }]} />
@@ -55,12 +59,12 @@ export default function StatsScreen() {
             {stat.avgRating != null && (
               <Text style={s.statSub}>★ {stat.avgRating.toFixed(1)}</Text>
             )}
-            <Text style={s.statSub}>{stat.completed} concluídos</Text>
+            <Text style={s.statSub}>{stat.completed} {t('stats_completed_suffix')}</Text>
           </View>
         </View>
       ))}
 
-      <Text style={[s.sectionTitle, { marginTop: 20 }]}>Por status</Text>
+      <Text style={[s.sectionTitle, { marginTop: 20 }]}>{t('stats_by_status')}</Text>
       {(Object.entries(data.statusBreakdown) as [WatchStatus, number][])
         .filter(([, count]) => count > 0)
         .sort(([, a], [, b]) => b - a)

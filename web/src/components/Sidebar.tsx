@@ -3,19 +3,21 @@ import { Home, Search, List, BarChart2, User, Sun, Moon, LogOut, Tv } from 'luci
 import { motion } from 'framer-motion'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useAuthStore } from '@/stores/authStore'
+import { useT } from '@/i18n/translations'
 import { cn } from '@/lib/utils'
-
-const NAV = [
-  { to: '/', icon: Home, label: 'Início', exact: true },
-  { to: '/search', icon: Search, label: 'Buscar' },
-  { to: '/list', icon: List, label: 'Minha Lista' },
-  { to: '/stats', icon: BarChart2, label: 'Estatísticas' },
-]
 
 export default function Sidebar() {
   const { theme, toggle } = useTheme()
   const { isAuthenticated, user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const t = useT()
+
+  const NAV = [
+    { to: '/', icon: Home, label: t('nav_home'), exact: true },
+    { to: '/search', icon: Search, label: t('nav_search') },
+    { to: '/list', icon: List, label: t('nav_list') },
+    { to: '/stats', icon: BarChart2, label: t('nav_stats') },
+  ]
 
   function handleLogout() {
     logout()
@@ -35,7 +37,7 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-6 px-3">
         <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-text-muted">
-          Menu
+          {t('nav_menu')}
         </p>
         <div className="space-y-0.5">
           {NAV.map(({ to, icon: Icon, label, exact }) => (
@@ -65,7 +67,7 @@ export default function Sidebar() {
         {isAuthenticated && (
           <>
             <p className="mb-2 mt-6 px-3 text-[10px] font-semibold uppercase tracking-widest text-text-muted">
-              Conta
+              {t('nav_account')}
             </p>
             <div className="space-y-0.5">
               <NavLink
@@ -80,7 +82,7 @@ export default function Sidebar() {
                 }
               >
                 <User size={18} />
-                Meu Perfil
+                {t('nav_profile')}
               </NavLink>
             </div>
           </>
@@ -95,7 +97,7 @@ export default function Sidebar() {
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-muted transition-colors hover:bg-surface-2 hover:text-text"
         >
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          {theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+          {theme === 'dark' ? t('theme_light') : t('theme_dark')}
         </button>
 
         {isAuthenticated ? (
@@ -104,7 +106,7 @@ export default function Sidebar() {
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-muted transition-colors hover:bg-red-500/10 hover:text-red-400"
           >
             <LogOut size={18} />
-            Sair
+            {t('logout')}
           </button>
         ) : (
           <div className="pt-2 space-y-2 px-1">
@@ -112,13 +114,13 @@ export default function Sidebar() {
               to="/login"
               className="block w-full rounded-xl border border-border py-2 text-center text-sm font-medium text-text-muted transition-colors hover:bg-surface-2 hover:text-text"
             >
-              Entrar
+              {t('login')}
             </NavLink>
             <NavLink
               to="/register"
               className="block w-full rounded-xl bg-gradient-purple-pink py-2 text-center text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90"
             >
-              Criar conta
+              {t('register')}
             </NavLink>
           </div>
         )}

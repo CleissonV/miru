@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/Badge'
 import { formatScore, cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/authStore'
-import { MEDIA_LABEL, STATUS_LABEL, type WatchStatus } from '@/types'
+import { useT, useMediaLabel, useStatusLabel } from '@/i18n/translations'
+import { type WatchStatus } from '@/types'
 
 const STATUS_OPTIONS: WatchStatus[] = [
   'PLAN_TO_WATCH',
@@ -25,6 +26,9 @@ export default function MediaDetail() {
   const { isAuthenticated } = useAuth()
   const language = useAuthStore(s => s.user?.language)
   const qc = useQueryClient()
+  const t = useT()
+  const MEDIA_LABEL = useMediaLabel()
+  const STATUS_LABEL = useStatusLabel()
 
   const [statusOpen, setStatusOpen] = useState(false)
   const [rating, setRating] = useState<number>(0)
@@ -109,7 +113,7 @@ export default function MediaDetail() {
           {/* Rating stars under poster */}
           {isAuthenticated && !currentEntry && (
             <div className="mt-3">
-              <p className="mb-1.5 text-center text-xs text-text-muted">Sua nota (opcional)</p>
+              <p className="mb-1.5 text-center text-xs text-text-muted">{t('detail_your_rating')}</p>
               <div className="flex justify-center gap-1">
                 {[2, 4, 6, 8, 10].map(v => (
                   <button
@@ -138,7 +142,7 @@ export default function MediaDetail() {
               <span className="text-sm text-text-muted">{media.year}</span>
             )}
             {media.episodes && (
-              <span className="text-sm text-text-muted">{media.episodes} episódios</span>
+              <span className="text-sm text-text-muted">{media.episodes} {t('detail_episodes')}</span>
             )}
           </div>
 
@@ -164,7 +168,7 @@ export default function MediaDetail() {
             <>
               {(media.type === 'ANIME' || media.type === 'MANGA') && (
                 <p className="mt-5 text-xs text-text-subtle">
-                  ℹ️ Sinopse disponível apenas em inglês (fonte: MyAnimeList).
+                  {t('detail_lang_note')}
                 </p>
               )}
               <p className={cn('max-w-2xl leading-relaxed text-text-muted', media.type === 'ANIME' || media.type === 'MANGA' ? 'mt-1.5' : 'mt-5')}>
@@ -218,7 +222,7 @@ export default function MediaDetail() {
                             onClick={() => removeEntry.mutate()}
                             className="w-full px-4 py-3 text-left text-sm text-red-400 transition-colors hover:bg-red-500/10"
                           >
-                            Remover da lista
+                            {t('detail_remove_from_list')}
                           </button>
                         </div>
                       </motion.div>
@@ -232,7 +236,7 @@ export default function MediaDetail() {
                     className="flex items-center gap-2 rounded-xl border border-brand-purple/40 bg-brand-purple/10 px-5 py-2.5 text-sm font-semibold text-brand-purple transition-all hover:bg-gradient-purple-pink hover:text-white hover:shadow-glow hover:border-transparent"
                   >
                     <Plus size={16} />
-                    Adicionar à lista
+                    {t('detail_add_to_list')}
                     <ChevronDown size={14} />
                   </button>
 

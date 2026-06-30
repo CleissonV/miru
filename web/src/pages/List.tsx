@@ -6,31 +6,35 @@ import { listEntries, deleteEntry, updateEntry } from '@/api/entries'
 import { getMediaDetail } from '@/api/media'
 import { Badge } from '@/components/ui/Badge'
 import { PosterSkeleton } from '@/components/ui/Skeleton'
-import { STATUS_LABEL, STATUS_COLOR, MEDIA_LABEL, type WatchStatus, type MediaType, type Entry } from '@/types'
+import { STATUS_COLOR, type WatchStatus, type MediaType, type Entry } from '@/types'
+import { useT, useStatusLabel, useMediaLabel } from '@/i18n/translations'
 import { cn } from '@/lib/utils'
-
-const STATUS_FILTERS: { label: string; value: WatchStatus | undefined; icon: React.ReactNode; color: string }[] = [
-  { label: 'Todos', value: undefined, icon: <LayoutGrid size={13} />, color: 'text-text-muted' },
-  { label: 'Assistindo', value: 'WATCHING', icon: <Eye size={13} />, color: 'text-brand-purple' },
-  { label: 'Concluídos', value: 'COMPLETED', icon: <CheckCircle2 size={13} />, color: 'text-green-400' },
-  { label: 'Planejados', value: 'PLAN_TO_WATCH', icon: <Clock size={13} />, color: 'text-brand-blue' },
-  { label: 'Em Pausa', value: 'ON_HOLD', icon: <PauseCircle size={13} />, color: 'text-yellow-400' },
-  { label: 'Abandonados', value: 'DROPPED', icon: <XCircle size={13} />, color: 'text-red-400' },
-]
-
-const TYPE_FILTERS: { label: string; value: MediaType | undefined; icon: React.ReactNode }[] = [
-  { label: 'Tudo', value: undefined, icon: <LayoutGrid size={13} /> },
-  { label: 'Filmes', value: 'MOVIE', icon: <Film size={13} /> },
-  { label: 'Séries', value: 'SERIES', icon: <Monitor size={13} /> },
-  { label: 'Animes', value: 'ANIME', icon: <Sword size={13} /> },
-  { label: 'Doramas', value: 'DORAMA', icon: <span className="text-[11px] leading-none">🌸</span> },
-  { label: 'Mangás', value: 'MANGA', icon: <BookOpen size={13} /> },
-]
 
 export default function List() {
   const [status, setStatus] = useState<WatchStatus | undefined>()
   const [mediaType, setMediaType] = useState<MediaType | undefined>()
   const qc = useQueryClient()
+  const t = useT()
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
+
+  const STATUS_FILTERS: { label: string; value: WatchStatus | undefined; icon: React.ReactNode; color: string }[] = [
+    { label: t('status_all'), value: undefined, icon: <LayoutGrid size={13} />, color: 'text-text-muted' },
+    { label: STATUS_LABEL.WATCHING, value: 'WATCHING', icon: <Eye size={13} />, color: 'text-brand-purple' },
+    { label: STATUS_LABEL.COMPLETED, value: 'COMPLETED', icon: <CheckCircle2 size={13} />, color: 'text-green-400' },
+    { label: STATUS_LABEL.PLAN_TO_WATCH, value: 'PLAN_TO_WATCH', icon: <Clock size={13} />, color: 'text-brand-blue' },
+    { label: STATUS_LABEL.ON_HOLD, value: 'ON_HOLD', icon: <PauseCircle size={13} />, color: 'text-yellow-400' },
+    { label: STATUS_LABEL.DROPPED, value: 'DROPPED', icon: <XCircle size={13} />, color: 'text-red-400' },
+  ]
+
+  const TYPE_FILTERS: { label: string; value: MediaType | undefined; icon: React.ReactNode }[] = [
+    { label: t('filter_all'), value: undefined, icon: <LayoutGrid size={13} /> },
+    { label: t('filter_movies'), value: 'MOVIE', icon: <Film size={13} /> },
+    { label: t('filter_series'), value: 'SERIES', icon: <Monitor size={13} /> },
+    { label: t('filter_anime'), value: 'ANIME', icon: <Sword size={13} /> },
+    { label: t('filter_dorama'), value: 'DORAMA', icon: <span className="text-[11px] leading-none">🌸</span> },
+    { label: t('filter_manga'), value: 'MANGA', icon: <BookOpen size={13} /> },
+  ]
 
   const { data, isLoading } = useQuery({
     queryKey: ['entries', status, mediaType],
@@ -50,10 +54,10 @@ export default function List() {
   return (
     <main className="px-8 py-8">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-text">Minha Lista</h1>
+        <h1 className="text-2xl font-bold text-text">{t('list_title')}</h1>
         {data && (
           <span className="text-sm text-text-muted">
-            {data.pagination.total} {data.pagination.total === 1 ? 'título' : 'títulos'}
+            {data.pagination.total} {data.pagination.total === 1 ? t('list_count_one') : t('list_count_many')}
           </span>
         )}
       </div>
@@ -62,7 +66,7 @@ export default function List() {
         {/* Status */}
         <div>
           <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-text-muted">
-            Status
+            {t('list_status_label')}
           </p>
           <div className="flex flex-wrap gap-2">
             {STATUS_FILTERS.map(({ label, value, icon, color }) => {
@@ -92,7 +96,7 @@ export default function List() {
         {/* Tipo */}
         <div>
           <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-text-muted">
-            Tipo de mídia
+            {t('list_type_label')}
           </p>
           <div className="flex flex-wrap gap-2">
             {TYPE_FILTERS.map(({ label, value, icon }) => {
@@ -154,6 +158,8 @@ function EntryCard({
     queryFn: () => getMediaDetail(entry.mediaType.toLowerCase(), entry.externalId),
     staleTime: 1000 * 60 * 60,
   })
+  const STATUS_LABEL = useStatusLabel()
+  const MEDIA_LABEL = useMediaLabel()
 
   return (
     <div className="group relative">
@@ -214,15 +220,16 @@ function EntryCard({
 }
 
 function EmptyState() {
+  const t = useT()
   return (
     <div className="py-24 text-center">
       <span className="text-5xl">見</span>
-      <p className="mt-4 text-text-muted">Sua lista está vazia</p>
+      <p className="mt-4 text-text-muted">{t('list_empty')}</p>
       <Link
         to="/search"
         className="mt-4 inline-block rounded-xl bg-gradient-purple-pink px-5 py-2.5 text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90"
       >
-        Buscar títulos
+        {t('list_search_cta')}
       </Link>
     </div>
   )
