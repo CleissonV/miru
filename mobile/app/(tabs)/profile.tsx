@@ -6,6 +6,7 @@ import { useAuthStore, type Language } from '@/stores/authStore'
 import { logout } from '@/api/auth'
 import { api } from '@/api/client'
 import { useT } from '@/i18n/translations'
+import { FlagBR, FlagUS } from '@/components/Flag'
 import { COLORS } from '@/lib/constants'
 
 export default function ProfileScreen() {
@@ -77,9 +78,9 @@ export default function ProfileScreen() {
         </View>
         <View style={s.langButtons}>
           {([
-            { value: 'pt-BR' as Language, flag: '🇧🇷', label: 'Português' },
-            { value: 'en' as Language, flag: '🇺🇸', label: 'English' },
-          ]).map(({ value, flag, label }) => {
+            { value: 'pt-BR' as Language, Flag: FlagBR, label: 'Português' },
+            { value: 'en' as Language, Flag: FlagUS, label: 'English' },
+          ]).map(({ value, Flag, label }) => {
             const active = (user.language ?? 'pt-BR') === value
             return (
               <Pressable
@@ -89,7 +90,7 @@ export default function ProfileScreen() {
                 accessibilityLabel={label}
                 style={[s.langBtn, active && s.langBtnActive]}
               >
-                <Text style={s.langBtnFlag}>{flag}</Text>
+                <Flag size={26} />
               </Pressable>
             )
           })}
@@ -183,6 +184,5 @@ const s = StyleSheet.create({
     backgroundColor: COLORS.surface2,
   },
   langBtnActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
-  langBtnFlag: { fontSize: 18 },
   langHint: { fontSize: 11, color: COLORS.subtle, marginTop: 10, lineHeight: 15 },
 })

@@ -8,6 +8,7 @@ import { getInitials } from '@/lib/utils'
 import { useAuthStore } from '@/stores/authStore'
 import { STATUS_COLOR, type Entry, type Language } from '@/types'
 import { useT, useStatusLabel, useMediaLabel } from '@/i18n/translations'
+import { FlagBR, FlagUS } from '@/components/ui/Flag'
 import { cn } from '@/lib/utils'
 
 export default function Profile() {
@@ -112,9 +113,9 @@ export default function Profile() {
           </div>
           <div className="flex gap-2">
             {([
-              { value: 'pt-BR', flag: '🇧🇷', label: 'Português' },
-              { value: 'en', flag: '🇺🇸', label: 'English' },
-            ] as { value: Language; flag: string; label: string }[]).map(({ value, flag, label }) => (
+              { value: 'pt-BR', Flag: FlagBR, label: 'Português' },
+              { value: 'en', Flag: FlagUS, label: 'English' },
+            ] as { value: Language; Flag: typeof FlagBR; label: string }[]).map(({ value, Flag, label }) => (
               <button
                 key={value}
                 onClick={() => updateLanguage.mutate(value)}
@@ -122,13 +123,13 @@ export default function Profile() {
                 title={label}
                 aria-label={label}
                 className={cn(
-                  'flex items-center justify-center rounded-xl px-4 py-2 text-xl transition-all',
+                  'flex items-center justify-center rounded-xl px-4 py-2.5 transition-all',
                   (loggedUser?.language ?? 'pt-BR') === value
                     ? 'bg-gradient-purple-pink shadow-glow'
                     : 'border border-border bg-surface-2 hover:bg-surface-3',
                 )}
               >
-                {flag}
+                <Flag size={22} />
               </button>
             ))}
           </div>
