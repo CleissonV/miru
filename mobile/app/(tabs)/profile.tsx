@@ -77,18 +77,19 @@ export default function ProfileScreen() {
         </View>
         <View style={s.langButtons}>
           {([
-            { value: 'pt-BR' as Language, label: 'Português' },
-            { value: 'en' as Language, label: 'English' },
-          ]).map(({ value, label }) => {
+            { value: 'pt-BR' as Language, flag: '🇧🇷', label: 'Português' },
+            { value: 'en' as Language, flag: '🇺🇸', label: 'English' },
+          ]).map(({ value, flag, label }) => {
             const active = (user.language ?? 'pt-BR') === value
             return (
               <Pressable
                 key={value}
                 onPress={() => updateLanguage.mutate(value)}
                 disabled={updateLanguage.isPending}
+                accessibilityLabel={label}
                 style={[s.langBtn, active && s.langBtnActive]}
               >
-                <Text style={[s.langBtnText, active && s.langBtnTextActive]}>{label}</Text>
+                <Text style={s.langBtnFlag}>{flag}</Text>
               </Pressable>
             )
           })}
@@ -182,7 +183,6 @@ const s = StyleSheet.create({
     backgroundColor: COLORS.surface2,
   },
   langBtnActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
-  langBtnText: { fontSize: 13, fontWeight: '500', color: COLORS.muted },
-  langBtnTextActive: { color: '#fff' },
+  langBtnFlag: { fontSize: 18 },
   langHint: { fontSize: 11, color: COLORS.subtle, marginTop: 10, lineHeight: 15 },
 })

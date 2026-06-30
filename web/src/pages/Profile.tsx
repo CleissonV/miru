@@ -112,21 +112,23 @@ export default function Profile() {
           </div>
           <div className="flex gap-2">
             {([
-              { value: 'pt-BR', label: 'Português' },
-              { value: 'en', label: 'English' },
-            ] as { value: Language; label: string }[]).map(({ value, label }) => (
+              { value: 'pt-BR', flag: '🇧🇷', label: 'Português' },
+              { value: 'en', flag: '🇺🇸', label: 'English' },
+            ] as { value: Language; flag: string; label: string }[]).map(({ value, flag, label }) => (
               <button
                 key={value}
                 onClick={() => updateLanguage.mutate(value)}
                 disabled={updateLanguage.isPending}
+                title={label}
+                aria-label={label}
                 className={cn(
-                  'rounded-xl px-4 py-2 text-sm font-medium transition-all',
+                  'flex items-center justify-center rounded-xl px-4 py-2 text-xl transition-all',
                   (loggedUser?.language ?? 'pt-BR') === value
-                    ? 'bg-gradient-purple-pink text-white shadow-glow'
-                    : 'border border-border bg-surface-2 text-text-muted hover:bg-surface-3 hover:text-text',
+                    ? 'bg-gradient-purple-pink shadow-glow'
+                    : 'border border-border bg-surface-2 hover:bg-surface-3',
                 )}
               >
-                {label}
+                {flag}
               </button>
             ))}
           </div>
