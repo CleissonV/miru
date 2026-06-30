@@ -1,19 +1,36 @@
-import { View, Text, Pressable, StyleSheet, ScrollView, Alert } from 'react-native'
+import { useState } from 'react'
+import { View, Text, Pressable, StyleSheet, ScrollView, Alert, Image, TextInput, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Globe } from 'lucide-react-native'
+import * as ImagePicker from 'expo-image-picker'
+import { Globe, Mail, Pencil, Check, X, Camera, KeyRound } from 'lucide-react-native'
 import { useAuthStore, type Language } from '@/stores/authStore'
-import { logout } from '@/api/auth'
+import { logout, resendVerification } from '@/api/auth'
+import { changePassword, uploadAvatar } from '@/api/users'
 import { api } from '@/api/client'
 import { useT } from '@/i18n/translations'
 import { FlagBR, FlagUS } from '@/components/Flag'
-import { COLORS } from '@/lib/constants'
+import { COLORS, MEDIA_BASE_URL } from '@/lib/constants'
 
 export default function ProfileScreen() {
   const { user, clearUser, setUser } = useAuthStore()
   const router = useRouter()
   const qc = useQueryClient()
   const t = useT()
+
+  const [verifySent, setVerifySent] = useState(false)
+  const [editingName, setEditingName] = useState(false)
+  const [nameInput, setNameInput] = useState('')
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [passwordMsg, setPasswordMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+
+  const invalidateMediaQueries = () => {
+    qc.invalidateQueries({ queryKey: ['trending'] })
+    qc.invalidateQueries({ queryKey: ['media'] })
+    qc.invalidateQueries({ queryKey: ['search'] })
+  }
 
   const updateLanguage = useMutation({
     mutationFn: async (language: Language) => {
@@ -22,11 +39,58 @@ export default function ProfileScreen() {
     },
     onSuccess: (updated) => {
       setUser(updated)
-      qc.invalidateQueries({ queryKey: ['trending'] })
-      qc.invalidateQueries({ queryKey: ['media'] })
-      qc.invalidateQueries({ queryKey: ['search'] })
+      invalidateMediaQueries()
     },
   })
+
+  const updateName = useMutation({
+    mutationFn: async (displayName: string) => {
+      const { data } = await api.patch('/users/me', { displayName })
+      return data
+    },
+    onSuccess: (updated) => {
+      setUser(updated)
+      setEditingName(false)
+    },
+  })
+
+  const avatarMutation = useMutation({
+    mutationFn: uploadAvatar,
+    onSuccess: (updated) => setUser(updated),
+  })
+
+  const passwordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: () => {
+      setPasswordMsg({ type: 'ok', text: t('profile_password_changed') })
+      setCurrentPassword('')
+      setNewPassword('')
+    },
+    onError: (e: any) => {
+      setPasswordMsg({ type: 'err', text: e?.response?.data?.error ?? 'Erro' })
+    },
+  })
+
+  const resendMutation = useMutation({
+    mutationFn: resendVerification,
+    onSuccess: () => setVerifySent(true),
+  })
+
+  async function handlePickAvatar() {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!permission.granted) return
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    })
+
+    if (!result.canceled && result.assets[0]) {
+      avatarMutation.mutate(result.assets[0])
+    }
+  }
 
   async function handleLogout() {
     Alert.alert(t('profile_logout_confirm_title'), t('profile_logout_confirm_msg'), [
@@ -52,14 +116,70 @@ export default function ProfileScreen() {
     .map(w => w[0].toUpperCase())
     .join('')
 
+  const avatarSrc = user.avatar
+    ? user.avatar.startsWith('http') ? user.avatar : `${MEDIA_BASE_URL}${user.avatar}`
+    : null
+
   return (
     <ScrollView style={s.root} contentContainerStyle={s.container}>
-      {/* Avatar */}
-      <View style={s.avatarCircle}>
-        <Text style={s.avatarText}>{initials}</Text>
-      </View>
+      {!user.emailVerified && (
+        <View style={s.verifyBanner}>
+          <Mail size={14} color={COLORS.yellow} />
+          <Text style={s.verifyText}>{t('verify_banner_text')}</Text>
+          {verifySent ? (
+            <Text style={s.verifySent}>{t('verify_banner_sent')}</Text>
+          ) : (
+            <Pressable onPress={() => resendMutation.mutate()} disabled={resendMutation.isPending}>
+              <Text style={s.verifyResend}>{t('verify_banner_resend')}</Text>
+            </Pressable>
+          )}
+        </View>
+      )}
 
-      <Text style={s.displayName}>{user.displayName ?? user.username}</Text>
+      {/* Avatar */}
+      <Pressable style={s.avatarCircle} onPress={handlePickAvatar} disabled={avatarMutation.isPending}>
+        {avatarSrc ? (
+          <Image source={{ uri: avatarSrc }} style={s.avatarImage} />
+        ) : (
+          <Text style={s.avatarText}>{initials}</Text>
+        )}
+        <View style={s.avatarOverlay}>
+          {avatarMutation.isPending ? <ActivityIndicator color="#fff" size="small" /> : <Camera size={16} color="#fff" />}
+        </View>
+      </Pressable>
+
+      {editingName ? (
+        <View style={s.nameEditRow}>
+          <TextInput
+            autoFocus
+            value={nameInput}
+            onChangeText={setNameInput}
+            maxLength={50}
+            style={s.nameInput}
+          />
+          <Pressable
+            onPress={() => nameInput.trim() && updateName.mutate(nameInput.trim())}
+            style={s.nameBtnOk}
+          >
+            <Check size={15} color={COLORS.green} />
+          </Pressable>
+          <Pressable onPress={() => setEditingName(false)} style={s.nameBtnCancel}>
+            <X size={15} color={COLORS.muted} />
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable
+          style={s.nameRow}
+          onPress={() => {
+            setNameInput(user.displayName ?? user.username)
+            setEditingName(true)
+          }}
+        >
+          <Text style={s.displayName}>{user.displayName ?? user.username}</Text>
+          <Pencil size={13} color={COLORS.subtle} />
+        </Pressable>
+      )}
+
       <Text style={s.username}>@{user.username}</Text>
       <Text style={s.email}>{user.email}</Text>
 
@@ -100,6 +220,51 @@ export default function ProfileScreen() {
         </Text>
       </View>
 
+      <View style={s.passwordCard}>
+        <Pressable style={s.passwordHeader} onPress={() => setShowPasswordForm(v => !v)}>
+          <KeyRound size={12} color={COLORS.muted} />
+          <Text style={s.langHeaderText}>{t('profile_change_password')}</Text>
+        </Pressable>
+
+        {showPasswordForm && (
+          <View style={s.passwordForm}>
+            <TextInput
+              style={s.passwordInput}
+              placeholder={t('profile_current_password')}
+              placeholderTextColor={COLORS.muted}
+              secureTextEntry
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+            />
+            <TextInput
+              style={s.passwordInput}
+              placeholder={t('profile_new_password')}
+              placeholderTextColor={COLORS.muted}
+              secureTextEntry
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+            {passwordMsg && (
+              <Text style={passwordMsg.type === 'ok' ? s.passwordMsgOk : s.passwordMsgErr}>
+                {passwordMsg.text}
+              </Text>
+            )}
+            <Pressable
+              style={s.passwordSaveBtn}
+              onPress={() => {
+                setPasswordMsg(null)
+                passwordMutation.mutate({ currentPassword, newPassword })
+              }}
+              disabled={passwordMutation.isPending}
+            >
+              {passwordMutation.isPending
+                ? <ActivityIndicator color="#fff" size="small" />
+                : <Text style={s.passwordSaveText}>{t('profile_save')}</Text>}
+            </Pressable>
+          </View>
+        )}
+      </View>
+
       <Pressable style={s.logoutBtn} onPress={handleLogout}>
         <Text style={s.logoutText}>{t('profile_logout')}</Text>
       </Pressable>
@@ -119,6 +284,21 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: COLORS.bg },
   container: { padding: 24, alignItems: 'center' },
+  verifyBanner: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: COLORS.yellow + '18',
+    borderWidth: 1,
+    borderColor: COLORS.yellow + '33',
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 16,
+  },
+  verifyText: { flex: 1, color: COLORS.yellow, fontSize: 12 },
+  verifyResend: { color: COLORS.yellow, fontSize: 12, fontWeight: '700' },
+  verifySent: { color: COLORS.green, fontSize: 12, fontWeight: '600' },
   avatarCircle: {
     width: 80,
     height: 80,
@@ -126,10 +306,33 @@ const s = StyleSheet.create({
     backgroundColor: COLORS.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
     marginTop: 8,
+    overflow: 'hidden',
   },
+  avatarImage: { width: '100%', height: '100%' },
   avatarText: { fontSize: 28, fontWeight: '700', color: '#fff' },
+  avatarOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    paddingVertical: 4,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  nameEditRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  nameInput: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.text,
+    backgroundColor: COLORS.surface2,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  nameBtnOk: { backgroundColor: COLORS.green + '22', borderRadius: 8, padding: 7 },
+  nameBtnCancel: { backgroundColor: COLORS.surface2, borderRadius: 8, padding: 7 },
   displayName: { fontSize: 22, fontWeight: '700', color: COLORS.text },
   username: { fontSize: 14, color: COLORS.muted, marginTop: 2 },
   email: { fontSize: 13, color: COLORS.subtle, marginTop: 4 },
@@ -185,4 +388,33 @@ const s = StyleSheet.create({
   },
   langBtnActive: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
   langHint: { fontSize: 11, color: COLORS.subtle, marginTop: 10, lineHeight: 15 },
+  passwordCard: {
+    marginTop: 12,
+    width: '100%',
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 14,
+  },
+  passwordHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  passwordForm: { marginTop: 12, gap: 8 },
+  passwordInput: {
+    backgroundColor: COLORS.surface2,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 10,
+    padding: 11,
+    color: COLORS.text,
+    fontSize: 13,
+  },
+  passwordMsgOk: { color: COLORS.green, fontSize: 12 },
+  passwordMsgErr: { color: COLORS.red, fontSize: 12 },
+  passwordSaveBtn: {
+    backgroundColor: COLORS.accent,
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  passwordSaveText: { color: '#fff', fontWeight: '700', fontSize: 13 },
 })

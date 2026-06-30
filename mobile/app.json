@@ -26,7 +26,13 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Miru precisa acessar suas fotos para você escolher uma foto de perfil."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

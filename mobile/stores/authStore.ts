@@ -9,6 +9,7 @@ interface AuthUser {
   displayName: string | null
   avatar: string | null
   language: Language
+  emailVerified: boolean
 }
 
 interface AuthState {

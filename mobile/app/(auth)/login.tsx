@@ -60,6 +60,8 @@ export default function LoginScreen() {
           secureTextEntry
         />
 
+        <Link href="/(auth)/forgot-password" style={s.forgotLink}>Esqueceu a senha?</Link>
+
         {error ? <Text style={s.error}>{error}</Text> : null}
 
         <Pressable style={[s.btn, loading && s.btnDisabled]} onPress={handleLogin} disabled={loading}>
@@ -93,6 +95,7 @@ const s = StyleSheet.create({
     fontSize: 15,
     marginBottom: 12,
   },
+  forgotLink: { color: COLORS.accent, fontSize: 13, fontWeight: '500', textAlign: 'right', marginBottom: 16 },
   error: { color: COLORS.red, fontSize: 13, marginBottom: 12, textAlign: 'center' },
   btn: {
     backgroundColor: COLORS.accent,

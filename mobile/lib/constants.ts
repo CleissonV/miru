@@ -6,6 +6,9 @@ export const API_URL = __DEV__
     : 'http://localhost:3333/api'
   : 'https://api.miru.app/api'
 
+// API_URL sem o sufixo /api — usado pra montar URL de arquivos estaticos (avatares)
+export const MEDIA_BASE_URL = API_URL.replace(/\/api$/, '')
+
 export const COLORS = {
   bg: '#09090b',
   surface: '#18181b',

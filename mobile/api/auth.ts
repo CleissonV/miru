@@ -9,6 +9,7 @@ interface AuthResponse {
     displayName: string | null
     avatar: string | null
     language: 'pt-BR' | 'en'
+    emailVerified: boolean
   }
   accessToken: string
   refreshToken: string
@@ -36,4 +37,23 @@ export async function register(data: {
 export async function logout(): Promise<void> {
   await SecureStore.deleteItemAsync('access_token')
   await SecureStore.deleteItemAsync('refresh_token')
+}
+
+export async function resendVerification(): Promise<{ message: string }> {
+  const res = await api.post('/auth/resend-verification')
+  return res.data
+}
+
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  const res = await api.post('/auth/forgot-password', { email })
+  return res.data
+}
+
+export async function resetPassword(data: {
+  email: string
+  code: string
+  newPassword: string
+}): Promise<{ message: string }> {
+  const res = await api.post('/auth/reset-password', data)
+  return res.data
 }
