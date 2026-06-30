@@ -1,4 +1,4 @@
-export type MediaType = 'MOVIE' | 'SERIES' | 'ANIME' | 'DORAMA'
+export type MediaType = 'MOVIE' | 'SERIES' | 'ANIME' | 'DORAMA' | 'MANGA'
 export type WatchStatus = 'PLAN_TO_WATCH' | 'WATCHING' | 'COMPLETED' | 'ON_HOLD' | 'DROPPED'
 
 export interface AuthPayload {
@@ -41,6 +41,22 @@ export interface JikanAnime {
   score: number | null
   episodes: number | null
   genres: Array<{ mal_id: number; name: string }>
+  status: string
+}
+
+export interface JikanManga {
+  mal_id: number
+  title: string
+  title_english: string | null
+  synopsis: string | null
+  images: {
+    jpg: { image_url: string; large_image_url: string }
+  }
+  published: { from: string | null }
+  score: number | null
+  chapters: number | null
+  genres: Array<{ mal_id: number; name: string }>
+  type: string
   status: string
 }
 

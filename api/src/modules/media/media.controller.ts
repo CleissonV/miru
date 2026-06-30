@@ -3,7 +3,7 @@ import { ApiError } from '../../utils/apiError'
 import * as mediaService from './media.service'
 import type { MediaType } from '../../types'
 
-const VALID_TYPES = new Set(['movie', 'series', 'anime', 'dorama'])
+const VALID_TYPES = new Set(['movie', 'series', 'anime', 'dorama', 'manga'])
 
 export async function detail(req: Request, res: Response) {
   const rawType = req.params.type.toLowerCase()

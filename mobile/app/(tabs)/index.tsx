@@ -11,6 +11,7 @@ const SECTIONS = [
   { key: 'series' as const, label: 'Séries em Alta', accent: COLORS.pink },
   { key: 'anime' as const, label: 'Animes Populares', accent: COLORS.blue },
   { key: 'doramas' as const, label: 'Doramas em Alta', accent: '#fb7185' },
+  { key: 'manga' as const, label: 'Mangás Populares', accent: '#fbbf24' },
 ]
 
 export default function HomeScreen() {
@@ -28,7 +29,7 @@ export default function HomeScreen() {
           {user ? `Olá, ${user.displayName ?? user.username} 👋` : 'Olá 👋'}
         </Text>
         <Text style={s.title}>Miru</Text>
-        <Text style={s.subtitle}>Filmes, séries, animes e doramas</Text>
+        <Text style={s.subtitle}>Filmes, séries, animes, doramas e mangás</Text>
       </View>
 
       {isLoading && (

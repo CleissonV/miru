@@ -93,7 +93,7 @@ export async function getStats(userId: string) {
     select: { mediaType: true, status: true, rating: true },
   })
 
-  const types = ['MOVIE', 'SERIES', 'ANIME'] as const
+  const types = ['MOVIE', 'SERIES', 'ANIME', 'DORAMA', 'MANGA'] as const
   const statusList = ['PLAN_TO_WATCH', 'WATCHING', 'COMPLETED', 'ON_HOLD', 'DROPPED'] as const
 
   const byType = Object.fromEntries(

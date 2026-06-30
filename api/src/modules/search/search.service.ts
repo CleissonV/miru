@@ -7,12 +7,14 @@ export async function search(query: string, type?: MediaType): Promise<MediaResu
   if (type === 'SERIES') return tmdb.searchSeries(query)
   if (type === 'ANIME') return jikan.searchAnime(query)
   if (type === 'DORAMA') return tmdb.searchDoramas(query)
+  if (type === 'MANGA') return jikan.searchManga(query)
 
-  const [movies, series, anime, doramas] = await Promise.allSettled([
+  const [movies, series, anime, doramas, manga] = await Promise.allSettled([
     tmdb.searchMovies(query),
     tmdb.searchSeries(query),
     jikan.searchAnime(query),
     tmdb.searchDoramas(query),
+    jikan.searchManga(query),
   ])
 
   return [
@@ -20,5 +22,6 @@ export async function search(query: string, type?: MediaType): Promise<MediaResu
     ...(series.status === 'fulfilled' ? series.value : []),
     ...(anime.status === 'fulfilled' ? anime.value : []),
     ...(doramas.status === 'fulfilled' ? doramas.value : []),
+    ...(manga.status === 'fulfilled' ? manga.value : []),
   ]
 }

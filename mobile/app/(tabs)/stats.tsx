@@ -9,6 +9,7 @@ const MEDIA_COLORS: Record<string, string> = {
   SERIES: COLORS.pink,
   ANIME: COLORS.blue,
   DORAMA: '#fb7185',
+  MANGA: '#fbbf24',
 }
 
 const STATUS_COLORS: Record<WatchStatus, string> = {

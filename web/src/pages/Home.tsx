@@ -12,6 +12,7 @@ const SECTION_COLORS = {
   series: 'from-brand-pink to-brand-blue',
   anime: 'from-brand-blue to-brand-purple',
   dorama: 'from-pink-400 to-rose-500',
+  manga: 'from-amber-400 to-orange-500',
 }
 
 export default function Home() {
@@ -71,7 +72,7 @@ export default function Home() {
             transition={{ delay: 0.1 }}
             className="mt-3 max-w-xl text-base text-text-muted"
           >
-            Filmes, séries, animes e doramas. Acompanhe, avalie e descubra novos títulos.
+            Filmes, séries, animes, doramas e mangás. Acompanhe, avalie e descubra novos títulos.
           </motion.p>
 
           <motion.div
@@ -176,6 +177,12 @@ export default function Home() {
           label: 'Doramas em Alta',
           items: trending?.doramas,
           gradient: SECTION_COLORS.dorama,
+        },
+        {
+          key: 'manga',
+          label: 'Mangás Populares',
+          items: trending?.manga,
+          gradient: SECTION_COLORS.manga,
         },
       ].map(({ key, label, items, gradient }) => (
         <TrendingRow key={key} label={label} items={items} gradient={gradient} />

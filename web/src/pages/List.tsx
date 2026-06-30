@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { Trash2, Tv, Eye, CheckCircle2, Clock, PauseCircle, XCircle, LayoutGrid, Film, Monitor, Sword } from 'lucide-react'
+import { Trash2, Tv, Eye, CheckCircle2, Clock, PauseCircle, XCircle, LayoutGrid, Film, Monitor, Sword, BookOpen } from 'lucide-react'
 import { listEntries, deleteEntry, updateEntry } from '@/api/entries'
 import { getMediaDetail } from '@/api/media'
 import { Badge } from '@/components/ui/Badge'
@@ -24,6 +24,7 @@ const TYPE_FILTERS: { label: string; value: MediaType | undefined; icon: React.R
   { label: 'Séries', value: 'SERIES', icon: <Monitor size={13} /> },
   { label: 'Animes', value: 'ANIME', icon: <Sword size={13} /> },
   { label: 'Doramas', value: 'DORAMA', icon: <span className="text-[11px] leading-none">🌸</span> },
+  { label: 'Mangás', value: 'MANGA', icon: <BookOpen size={13} /> },
 ]
 
 export default function List() {

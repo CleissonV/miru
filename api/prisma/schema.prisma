@@ -13,6 +13,7 @@ enum MediaType {
   SERIES
   ANIME
   DORAMA
+  MANGA
 }
 
 enum WatchStatus {

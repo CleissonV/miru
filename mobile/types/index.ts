@@ -1,4 +1,4 @@
-export type MediaType = 'MOVIE' | 'SERIES' | 'ANIME' | 'DORAMA'
+export type MediaType = 'MOVIE' | 'SERIES' | 'ANIME' | 'DORAMA' | 'MANGA'
 
 export type WatchStatus =
   | 'PLAN_TO_WATCH'
@@ -49,6 +49,7 @@ export interface TrendingResponse {
   series: MediaResult[]
   anime: MediaResult[]
   doramas: MediaResult[]
+  manga: MediaResult[]
 }
 
 export interface EntryStats {
@@ -70,4 +71,5 @@ export const MEDIA_LABEL: Record<MediaType, string> = {
   SERIES: 'Série',
   ANIME: 'Anime',
   DORAMA: 'Dorama',
+  MANGA: 'Manga',
 }

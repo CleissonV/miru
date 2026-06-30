@@ -7,7 +7,7 @@ import { getStats } from '@/api/entries'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { STATUS_LABEL, MEDIA_LABEL } from '@/types'
 
-const TYPE_COLORS = { MOVIE: '#818cf8', SERIES: '#f472b6', ANIME: '#60a5fa' }
+const TYPE_COLORS = { MOVIE: '#818cf8', SERIES: '#f472b6', ANIME: '#60a5fa', DORAMA: '#fb7185', MANGA: '#fbbf24' }
 const STATUS_COLORS: Record<string, string> = {
   PLAN_TO_WATCH: '#3d3d5c',
   WATCHING: '#818cf8',

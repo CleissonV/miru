@@ -15,6 +15,7 @@ const TYPES: { label: string; value: MediaType | undefined }[] = [
   { label: 'Séries', value: 'SERIES' },
   { label: 'Animes', value: 'ANIME' },
   { label: 'Doramas', value: 'DORAMA' },
+  { label: 'Mangás', value: 'MANGA' },
 ]
 
 export default function Search() {

@@ -21,6 +21,7 @@ export async function getDetail(type: MediaType, id: number): Promise<MediaResul
   else if (type === 'SERIES') result = await tmdb.getSeries(id)
   else if (type === 'ANIME') result = await jikan.getAnime(id)
   else if (type === 'DORAMA') result = await tmdb.getDorama(id)
+  else if (type === 'MANGA') result = await jikan.getManga(id)
   else throw ApiError.badRequest('Tipo de mídia inválido')
 
   await db.mediaCache.upsert({
@@ -33,10 +34,11 @@ export async function getDetail(type: MediaType, id: number): Promise<MediaResul
 }
 
 export async function getTrending() {
-  const [trending, topAnime, doramas] = await Promise.all([
+  const [trending, topAnime, doramas, topManga] = await Promise.all([
     tmdb.getTrending(),
     jikan.getTopAnime(),
     tmdb.getTrendingDoramas(),
+    jikan.getTopManga(),
   ])
 
   return {
@@ -44,5 +46,6 @@ export async function getTrending() {
     series: trending.filter(m => m.type === 'SERIES').slice(0, 8),
     anime: topAnime.slice(0, 8),
     doramas: doramas.slice(0, 8),
+    manga: topManga.slice(0, 8),
   }
 }
