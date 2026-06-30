@@ -41,5 +41,7 @@ web/.vite/
 # Prisma binary query engine (platform-specific, regenerated on install)
 api/node_modules/.prisma/
 
-# Mobile app (separate project with own git repo)
-mobile/
+# Mobile — node_modules only (source tracked in monorepo)
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
