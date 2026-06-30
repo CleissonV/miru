@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MediaType {
+  MOVIE
+  SERIES
+  ANIME
+  DORAMA
+}
+
+enum WatchStatus {
+  PLAN_TO_WATCH
+  WATCHING
+  COMPLETED
+  ON_HOLD
+  DROPPED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  displayName  String?  @map("display_name")
+  bio          String?
+  avatar       String?
+  isPublic     Boolean  @default(true) @map("is_public")
+  entries      Entry[]
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Entry {
+  id              String      @id @default(cuid())
+  userId          String      @map("user_id")
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaType       MediaType   @map("media_type")
+  externalId      Int         @map("external_id")
+  status          WatchStatus
+  rating          Float?
+  episodesWatched Int?        @map("episodes_watched")
+  notes           String?
+  startedAt       DateTime?   @map("started_at")
+  completedAt     DateTime?   @map("completed_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  @@unique([userId, mediaType, externalId])
+  @@index([userId, status])
+  @@index([userId, mediaType])
+  @@map("entries")
+}
+
+model MediaCache {
+  externalId Int
+  mediaType  MediaType @map("media_type")
+  data       Json
+  cachedAt   DateTime  @default(now()) @map("cached_at")
+
+  @@id([externalId, mediaType])
+  @@map("media_cache")
+}

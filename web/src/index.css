@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #0a0a12;
+    --surface: #12121f;
+    --surface-2: #1a1a2e;
+    --surface-3: #22223a;
+    --border: #1e1e3a;
+    --text: #e2e2ff;
+    --muted: #6b6b8a;
+    --subtle: #3d3d5c;
+  }
+
+  .light {
+    --bg: #f5f3ff;
+    --surface: #ffffff;
+    --surface-2: #ede9fe;
+    --surface-3: #ddd6fe;
+    --border: #c4b5fd;
+    --text: #1e1b4b;
+    --muted: #6b7280;
+    --subtle: #9ca3af;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    @apply antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--subtle); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+}
+
+@layer utilities {
+  .poster-aspect { aspect-ratio: 2 / 3; }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  .glass {
+    background: rgba(18, 18, 31, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+  }
+
+  .light .glass {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #818cf8, #f472b6, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(129, 140, 248, 0.15);
+  }
+}
