@@ -6,9 +6,13 @@ import type { TmdbMovie, TmdbSeries, MediaResult } from '../../../types'
 const POSTER_BASE = 'https://image.tmdb.org/t/p/w500'
 const CACHE_TTL = 60 * 60 * 24 // 24h
 
+export type Lang = 'pt-BR' | 'en'
+
+const TMDB_LANG: Record<Lang, string> = { 'pt-BR': 'pt-BR', en: 'en-US' }
+
 const client = axios.create({
   baseURL: 'https://api.themoviedb.org/3',
-  params: { api_key: env.TMDB_API_KEY, language: 'pt-BR' },
+  params: { api_key: env.TMDB_API_KEY },
   timeout: 8000,
 })
 
@@ -55,43 +59,47 @@ async function cached<T>(key: string, fn: () => Promise<T>): Promise<T> {
   return data
 }
 
-export async function searchMovies(query: string): Promise<MediaResult[]> {
-  return cached(`tmdb:search:movies:${query}`, async () => {
+export async function searchMovies(query: string, lang: Lang = 'pt-BR'): Promise<MediaResult[]> {
+  return cached(`tmdb:search:movies:${lang}:${query}`, async () => {
     const { data } = await client.get<{ results: TmdbMovie[] }>('/search/movie', {
-      params: { query },
+      params: { query, language: TMDB_LANG[lang] },
     })
     return data.results.slice(0, 10).map(movieToResult)
   })
 }
 
-export async function searchSeries(query: string): Promise<MediaResult[]> {
-  return cached(`tmdb:search:series:${query}`, async () => {
+export async function searchSeries(query: string, lang: Lang = 'pt-BR'): Promise<MediaResult[]> {
+  return cached(`tmdb:search:series:${lang}:${query}`, async () => {
     const { data } = await client.get<{ results: TmdbSeries[] }>('/search/tv', {
-      params: { query },
+      params: { query, language: TMDB_LANG[lang] },
     })
     return data.results.slice(0, 10).map(seriesToResult)
   })
 }
 
-export async function getMovie(id: number): Promise<MediaResult> {
-  return cached(`tmdb:movie:${id}`, async () => {
-    const { data } = await client.get<TmdbMovie>(`/movie/${id}`)
+export async function getMovie(id: number, lang: Lang = 'pt-BR'): Promise<MediaResult> {
+  return cached(`tmdb:movie:${id}:${lang}`, async () => {
+    const { data } = await client.get<TmdbMovie>(`/movie/${id}`, {
+      params: { language: TMDB_LANG[lang] },
+    })
     return movieToResult(data)
   })
 }
 
-export async function getSeries(id: number): Promise<MediaResult> {
-  return cached(`tmdb:series:${id}`, async () => {
-    const { data } = await client.get<TmdbSeries>(`/tv/${id}`)
+export async function getSeries(id: number, lang: Lang = 'pt-BR'): Promise<MediaResult> {
+  return cached(`tmdb:series:${id}:${lang}`, async () => {
+    const { data } = await client.get<TmdbSeries>(`/tv/${id}`, {
+      params: { language: TMDB_LANG[lang] },
+    })
     return seriesToResult(data)
   })
 }
 
-export async function getTrending(): Promise<MediaResult[]> {
-  return cached('tmdb:trending', async () => {
+export async function getTrending(lang: Lang = 'pt-BR'): Promise<MediaResult[]> {
+  return cached(`tmdb:trending:${lang}`, async () => {
     const [moviesRes, seriesRes] = await Promise.all([
-      client.get<{ results: TmdbMovie[] }>('/trending/movie/week'),
-      client.get<{ results: TmdbSeries[] }>('/trending/tv/week'),
+      client.get<{ results: TmdbMovie[] }>('/trending/movie/week', { params: { language: TMDB_LANG[lang] } }),
+      client.get<{ results: TmdbSeries[] }>('/trending/tv/week', { params: { language: TMDB_LANG[lang] } }),
     ])
     return [
       ...moviesRes.data.results.slice(0, 8).map(movieToResult),
@@ -100,31 +108,34 @@ export async function getTrending(): Promise<MediaResult[]> {
   })
 }
 
-export async function getTrendingDoramas(): Promise<MediaResult[]> {
-  return cached('tmdb:trending:doramas', async () => {
+export async function getTrendingDoramas(lang: Lang = 'pt-BR'): Promise<MediaResult[]> {
+  return cached(`tmdb:trending:doramas:${lang}`, async () => {
     const { data } = await client.get<{ results: TmdbSeries[] }>('/discover/tv', {
       params: {
         with_origin_country: 'KR',
         sort_by: 'popularity.desc',
         'vote_count.gte': 100,
+        language: TMDB_LANG[lang],
       },
     })
     return data.results.slice(0, 8).map(s => ({ ...seriesToResult(s), type: 'DORAMA' as const }))
   })
 }
 
-export async function searchDoramas(query: string): Promise<MediaResult[]> {
-  return cached(`tmdb:search:doramas:${query}`, async () => {
+export async function searchDoramas(query: string, lang: Lang = 'pt-BR'): Promise<MediaResult[]> {
+  return cached(`tmdb:search:doramas:${lang}:${query}`, async () => {
     const { data } = await client.get<{ results: TmdbSeries[] }>('/search/tv', {
-      params: { query, with_origin_country: 'KR' },
+      params: { query, with_origin_country: 'KR', language: TMDB_LANG[lang] },
     })
     return data.results.slice(0, 10).map(s => ({ ...seriesToResult(s), type: 'DORAMA' as const }))
   })
 }
 
-export async function getDorama(id: number): Promise<MediaResult> {
-  return cached(`tmdb:dorama:${id}`, async () => {
-    const { data } = await client.get<TmdbSeries>(`/tv/${id}`)
+export async function getDorama(id: number, lang: Lang = 'pt-BR'): Promise<MediaResult> {
+  return cached(`tmdb:dorama:${id}:${lang}`, async () => {
+    const { data } = await client.get<TmdbSeries>(`/tv/${id}`, {
+      params: { language: TMDB_LANG[lang] },
+    })
     return { ...seriesToResult(data), type: 'DORAMA' as const }
   })
 }

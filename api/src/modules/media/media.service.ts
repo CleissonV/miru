@@ -3,24 +3,27 @@ import { ApiError } from '../../utils/apiError'
 import type { MediaType, MediaResult } from '../../types'
 import * as tmdb from './providers/tmdb'
 import * as jikan from './providers/jikan'
+import type { Lang } from './providers/tmdb'
 
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 // 24h
 
-export async function getDetail(type: MediaType, id: number): Promise<MediaResult> {
+export async function getDetail(type: MediaType, id: number, lang: Lang = 'pt-BR'): Promise<MediaResult> {
   const cached = await db.mediaCache.findUnique({
     where: { externalId_mediaType: { externalId: id, mediaType: type } },
   })
 
-  if (cached && Date.now() - cached.cachedAt.getTime() < CACHE_TTL_MS) {
+  // Jikan (anime/manga) não tem dados localizados, cache vale pra qualquer lang
+  const cacheIsFresh = cached && Date.now() - cached.cachedAt.getTime() < CACHE_TTL_MS
+  if (cacheIsFresh && (type === 'ANIME' || type === 'MANGA')) {
     return cached.data as unknown as MediaResult
   }
 
   let result: MediaResult
 
-  if (type === 'MOVIE') result = await tmdb.getMovie(id)
-  else if (type === 'SERIES') result = await tmdb.getSeries(id)
+  if (type === 'MOVIE') result = await tmdb.getMovie(id, lang)
+  else if (type === 'SERIES') result = await tmdb.getSeries(id, lang)
   else if (type === 'ANIME') result = await jikan.getAnime(id)
-  else if (type === 'DORAMA') result = await tmdb.getDorama(id)
+  else if (type === 'DORAMA') result = await tmdb.getDorama(id, lang)
   else if (type === 'MANGA') result = await jikan.getManga(id)
   else throw ApiError.badRequest('Tipo de mídia inválido')
 
@@ -33,11 +36,11 @@ export async function getDetail(type: MediaType, id: number): Promise<MediaResul
   return result
 }
 
-export async function getTrending() {
+export async function getTrending(lang: Lang = 'pt-BR') {
   const [trending, topAnime, doramas, topManga] = await Promise.all([
-    tmdb.getTrending(),
+    tmdb.getTrending(lang),
     jikan.getTopAnime(),
-    tmdb.getTrendingDoramas(),
+    tmdb.getTrendingDoramas(lang),
     jikan.getTopManga(),
   ])
 

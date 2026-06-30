@@ -7,8 +7,9 @@ import { getMediaDetail } from '@/api/media'
 import { createEntry, updateEntry, deleteEntry, listEntries } from '@/api/entries'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Badge } from '@/components/ui/Badge'
-import { formatScore } from '@/lib/utils'
+import { formatScore, cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
+import { useAuthStore } from '@/stores/authStore'
 import { MEDIA_LABEL, STATUS_LABEL, type WatchStatus } from '@/types'
 
 const STATUS_OPTIONS: WatchStatus[] = [
@@ -22,6 +23,7 @@ const STATUS_OPTIONS: WatchStatus[] = [
 export default function MediaDetail() {
   const { type = '', id = '' } = useParams()
   const { isAuthenticated } = useAuth()
+  const language = useAuthStore(s => s.user?.language)
   const qc = useQueryClient()
 
   const [statusOpen, setStatusOpen] = useState(false)
@@ -30,7 +32,7 @@ export default function MediaDetail() {
   const mediaId = parseInt(id, 10)
 
   const { data: media, isLoading } = useQuery({
-    queryKey: ['media', type, mediaId],
+    queryKey: ['media', type, mediaId, language],
     queryFn: () => getMediaDetail(type, mediaId),
     enabled: !!type && !!mediaId,
   })
@@ -159,7 +161,16 @@ export default function MediaDetail() {
           )}
 
           {media.overview && (
-            <p className="mt-5 max-w-2xl leading-relaxed text-text-muted">{media.overview}</p>
+            <>
+              {(media.type === 'ANIME' || media.type === 'MANGA') && (
+                <p className="mt-5 text-xs text-text-subtle">
+                  ℹ️ Sinopse disponível apenas em inglês (fonte: MyAnimeList).
+                </p>
+              )}
+              <p className={cn('max-w-2xl leading-relaxed text-text-muted', media.type === 'ANIME' || media.type === 'MANGA' ? 'mt-1.5' : 'mt-5')}>
+                {media.overview}
+              </p>
+            </>
           )}
 
           {/* Actions */}

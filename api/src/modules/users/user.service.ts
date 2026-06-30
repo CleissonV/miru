@@ -44,6 +44,7 @@ export async function updateProfile(
     bio?: string
     avatar?: string
     isPublic?: boolean
+    language?: string
   },
 ) {
   return db.user.update({
@@ -57,6 +58,7 @@ export async function updateProfile(
       avatar: true,
       bio: true,
       isPublic: true,
+      language: true,
     },
   })
 }

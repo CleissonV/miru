@@ -32,6 +32,7 @@ export async function me(req: Request, res: Response) {
       avatar: true,
       bio: true,
       isPublic: true,
+      language: true,
       createdAt: true,
     },
   })

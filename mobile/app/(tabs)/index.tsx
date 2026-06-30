@@ -17,7 +17,7 @@ const SECTIONS = [
 export default function HomeScreen() {
   const user = useAuthStore(s => s.user)
   const { data, isLoading } = useQuery({
-    queryKey: ['trending'],
+    queryKey: ['trending', user?.language],
     queryFn: getTrending,
     staleTime: 1000 * 60 * 10,
   })

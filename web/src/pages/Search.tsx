@@ -6,6 +6,7 @@ import { search } from '@/api/search'
 import MediaCard from '@/components/MediaCard'
 import { PosterSkeleton } from '@/components/ui/Skeleton'
 import { useDebounce } from '@/hooks/useDebounce'
+import { useAuthStore } from '@/stores/authStore'
 import type { MediaType } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -26,6 +27,7 @@ export default function Search() {
   )
 
   const debounced = useDebounce(query)
+  const language = useAuthStore(s => s.user?.language)
 
   useEffect(() => {
     const params: Record<string, string> = {}
@@ -35,7 +37,7 @@ export default function Search() {
   }, [debounced, activeType, setSearchParams])
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['search', debounced, activeType],
+    queryKey: ['search', debounced, activeType, language],
     queryFn: () => search(debounced, activeType),
     enabled: debounced.length > 1,
   })

@@ -19,7 +19,7 @@ export default function Home() {
   const { isAuthenticated, user } = useAuthStore()
 
   const { data: trending } = useQuery({
-    queryKey: ['trending'],
+    queryKey: ['trending', user?.language],
     queryFn: getTrending,
     staleTime: 1000 * 60 * 10,
   })

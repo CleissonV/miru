@@ -7,6 +7,8 @@ export type WatchStatus =
   | 'ON_HOLD'
   | 'DROPPED'
 
+export type Language = 'pt-BR' | 'en'
+
 export interface User {
   id: string
   email: string
@@ -15,6 +17,7 @@ export interface User {
   avatar: string | null
   bio: string | null
   isPublic: boolean
+  language: Language
   createdAt: string
 }
 

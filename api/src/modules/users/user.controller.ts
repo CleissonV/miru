@@ -7,6 +7,7 @@ const updateProfileSchema = z.object({
   bio: z.string().max(300).optional(),
   avatar: z.string().url().optional(),
   isPublic: z.boolean().optional(),
+  language: z.enum(['pt-BR', 'en']).optional(),
 })
 
 export async function profile(req: Request, res: Response) {

@@ -7,6 +7,7 @@ import { useLocalSearchParams, useNavigation } from 'expo-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getMediaDetail } from '@/api/media'
 import { listEntries, createEntry, updateEntry, deleteEntry } from '@/api/entries'
+import { useAuthStore } from '@/stores/authStore'
 import { STATUS_LABEL, MEDIA_LABEL, type WatchStatus } from '@/types'
 import { COLORS } from '@/lib/constants'
 import { useEffect } from 'react'
@@ -26,9 +27,10 @@ export default function MediaDetailScreen() {
   const navigation = useNavigation()
   const qc = useQueryClient()
   const [modalVisible, setModalVisible] = useState(false)
+  const language = useAuthStore(s => s.user?.language)
 
   const { data: media, isLoading } = useQuery({
-    queryKey: ['media', type, Number(id)],
+    queryKey: ['media', type, Number(id), language],
     queryFn: () => getMediaDetail(type!, Number(id)),
     enabled: !!type && !!id,
   })
@@ -133,7 +135,12 @@ export default function MediaDetailScreen() {
 
           {/* Overview */}
           {media.overview ? (
-            <Text style={s.overview}>{media.overview}</Text>
+            <>
+              {(media.type === 'ANIME' || media.type === 'MANGA') && (
+                <Text style={s.langNote}>ℹ️ Sinopse disponível apenas em inglês (fonte: MyAnimeList).</Text>
+              )}
+              <Text style={s.overview}>{media.overview}</Text>
+            </>
           ) : null}
 
           {/* Current status if in list */}
@@ -248,6 +255,7 @@ const s = StyleSheet.create({
   },
   genreText: { color: COLORS.text, fontSize: 12 },
   overview: { color: COLORS.muted, fontSize: 14, lineHeight: 22, marginBottom: 20 },
+  langNote: { color: COLORS.subtle, fontSize: 11, marginBottom: 6 },
   statusBanner: {
     flexDirection: 'row',
     justifyContent: 'space-between',

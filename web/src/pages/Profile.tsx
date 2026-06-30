@@ -1,14 +1,32 @@
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Globe } from 'lucide-react'
 import { api } from '@/api/client'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Badge } from '@/components/ui/Badge'
 import { getInitials } from '@/lib/utils'
-import { MEDIA_LABEL, STATUS_LABEL, STATUS_COLOR, type Entry } from '@/types'
+import { useAuthStore } from '@/stores/authStore'
+import { MEDIA_LABEL, STATUS_LABEL, STATUS_COLOR, type Entry, type Language } from '@/types'
 import { cn } from '@/lib/utils'
 
 export default function Profile() {
   const { username = '' } = useParams()
+  const { user: loggedUser, setUser } = useAuthStore()
+  const isOwnProfile = loggedUser?.username === username
+  const qc = useQueryClient()
+
+  const updateLanguage = useMutation({
+    mutationFn: async (language: Language) => {
+      const res = await api.patch('/users/me', { language })
+      return res.data
+    },
+    onSuccess: (updated) => {
+      setUser(updated)
+      qc.invalidateQueries({ queryKey: ['trending'] })
+      qc.invalidateQueries({ queryKey: ['media'] })
+      qc.invalidateQueries({ queryKey: ['search'] })
+    },
+  })
 
   const { data: profile, isLoading: loadingProfile, error } = useQuery({
     queryKey: ['profile', username],
@@ -80,6 +98,39 @@ export default function Profile() {
           </p>
         </div>
       </div>
+
+      {/* Language preference (own profile only) */}
+      {isOwnProfile && (
+        <div className="mb-10 rounded-2xl border border-border bg-surface p-4">
+          <div className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-text-muted">
+            <Globe size={12} />
+            Idioma das descrições
+          </div>
+          <div className="flex gap-2">
+            {([
+              { value: 'pt-BR', label: 'Português' },
+              { value: 'en', label: 'English' },
+            ] as { value: Language; label: string }[]).map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => updateLanguage.mutate(value)}
+                disabled={updateLanguage.isPending}
+                className={cn(
+                  'rounded-xl px-4 py-2 text-sm font-medium transition-all',
+                  (loggedUser?.language ?? 'pt-BR') === value
+                    ? 'bg-gradient-purple-pink text-white shadow-glow'
+                    : 'border border-border bg-surface-2 text-text-muted hover:bg-surface-3 hover:text-text',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2.5 text-xs text-text-subtle">
+            Vale para filmes, séries e doramas. Animes e mangás (MyAnimeList) ficam sempre em inglês.
+          </p>
+        </div>
+      )}
 
       {/* Status breakdown */}
       {byStatus && Object.keys(byStatus).length > 0 && (

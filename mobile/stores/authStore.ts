@@ -1,11 +1,14 @@
 import { create } from 'zustand'
 
+export type Language = 'pt-BR' | 'en'
+
 interface AuthUser {
   id: string
   username: string
   email: string
   displayName: string | null
   avatar: string | null
+  language: Language
 }
 
 interface AuthState {

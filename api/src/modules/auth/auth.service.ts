@@ -30,6 +30,7 @@ export async function register(data: RegisterBody) {
       username: true,
       displayName: true,
       avatar: true,
+      language: true,
     },
   })
 
@@ -65,6 +66,7 @@ export async function login(data: LoginBody) {
       username: user.username,
       displayName: user.displayName,
       avatar: user.avatar,
+      language: user.language,
     },
     accessToken: signAccessToken(payload),
     refreshToken: signRefreshToken(payload),

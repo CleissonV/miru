@@ -16,7 +16,7 @@ export default function Index() {
       const token = await SecureStore.getItemAsync('access_token')
       if (token) {
         try {
-          const { data } = await api.get('/users/me')
+          const { data } = await api.get('/auth/me')
           setUser(data)
         } catch {
           await SecureStore.deleteItemAsync('access_token')

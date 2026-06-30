@@ -6,6 +6,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { search } from '@/api/media'
+import { useAuthStore } from '@/stores/authStore'
 import type { MediaType, MediaResult } from '@/types'
 import { MEDIA_LABEL } from '@/types'
 import { COLORS } from '@/lib/constants'
@@ -24,6 +25,7 @@ export default function SearchScreen() {
   const [debounced, setDebounced] = useState('')
   const [activeType, setActiveType] = useState<MediaType | undefined>()
   const router = useRouter()
+  const language = useAuthStore(s => s.user?.language)
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(query), 400)
@@ -31,7 +33,7 @@ export default function SearchScreen() {
   }, [query])
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['search', debounced, activeType],
+    queryKey: ['search', debounced, activeType, language],
     queryFn: () => search(debounced, activeType),
     enabled: debounced.length > 1,
   })
