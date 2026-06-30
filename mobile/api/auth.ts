@@ -22,15 +22,17 @@ export async function login(email: string, password: string): Promise<AuthRespon
   return res.data
 }
 
+interface RegisterResponse {
+  user: { id: string; email: string; username: string }
+}
+
 export async function register(data: {
   email: string
   username: string
   password: string
   displayName?: string
-}): Promise<AuthResponse> {
-  const res = await api.post<AuthResponse>('/auth/register', data)
-  await SecureStore.setItemAsync('access_token', res.data.accessToken)
-  await SecureStore.setItemAsync('refresh_token', res.data.refreshToken)
+}): Promise<RegisterResponse> {
+  const res = await api.post<RegisterResponse>('/auth/register', data)
   return res.data
 }
 
@@ -39,8 +41,8 @@ export async function logout(): Promise<void> {
   await SecureStore.deleteItemAsync('refresh_token')
 }
 
-export async function resendVerification(): Promise<{ message: string }> {
-  const res = await api.post('/auth/resend-verification')
+export async function resendVerification(email: string): Promise<{ message: string }> {
+  const res = await api.post('/auth/resend-verification', { email })
   return res.data
 }
 

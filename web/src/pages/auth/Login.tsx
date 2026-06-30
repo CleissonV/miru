@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
 import { Eye, EyeOff, Tv } from 'lucide-react'
 import { useLogin } from '@/hooks/useAuth'
+import { resendVerification } from '@/api/auth'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -9,6 +11,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
 
   const login = useLogin()
+  const resend = useMutation({ mutationFn: resendVerification })
+
+  const isUnverified = (login.error as any)?.response?.data?.code === 'EMAIL_NOT_VERIFIED'
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -73,9 +78,23 @@ export default function Login() {
             </div>
 
             {login.error && (
-              <p className="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-400 border border-red-500/20">
-                {(login.error as any)?.response?.data?.error ?? 'Erro ao entrar. Tente novamente.'}
-              </p>
+              <div className="rounded-xl bg-red-500/10 px-3 py-2.5 text-sm text-red-400 border border-red-500/20">
+                <p>{(login.error as any)?.response?.data?.error ?? 'Erro ao entrar. Tente novamente.'}</p>
+                {isUnverified && (
+                  resend.isSuccess ? (
+                    <p className="mt-1.5 text-xs text-green-400">E-mail reenviado! Verifique sua caixa de entrada.</p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => resend.mutate(email)}
+                      disabled={resend.isPending}
+                      className="mt-1.5 text-xs font-semibold text-red-300 underline hover:text-red-200"
+                    >
+                      Reenviar e-mail de confirmação
+                    </button>
+                  )
+                )}
+              </div>
             )}
 
             <button

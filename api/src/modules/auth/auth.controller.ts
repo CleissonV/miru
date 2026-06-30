@@ -54,8 +54,9 @@ export async function verifyEmail(req: Request, res: Response) {
 }
 
 export async function resendVerification(req: Request, res: Response) {
-  await authService.resendVerification(req.user!.sub)
-  res.json({ message: 'E-mail de verificação reenviado' })
+  const { email } = forgotPasswordSchema.parse(req.body)
+  await authService.resendVerification(email)
+  res.json({ message: 'Se o e-mail existir e não estiver verificado, reenviamos a confirmação' })
 }
 
 export async function forgotPassword(req: Request, res: Response) {

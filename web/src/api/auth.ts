@@ -7,13 +7,17 @@ interface AuthResponse {
   refreshToken: string
 }
 
+interface RegisterResponse {
+  user: { id: string; email: string; username: string }
+}
+
 export async function register(data: {
   email: string
   username: string
   password: string
   displayName?: string
-}): Promise<AuthResponse> {
-  const res = await api.post<AuthResponse>('/auth/register', data)
+}): Promise<RegisterResponse> {
+  const res = await api.post<RegisterResponse>('/auth/register', data)
   return res.data
 }
 
@@ -35,8 +39,8 @@ export async function verifyEmail(token: string): Promise<{ message: string }> {
   return res.data
 }
 
-export async function resendVerification(): Promise<{ message: string }> {
-  const res = await api.post('/auth/resend-verification')
+export async function resendVerification(email: string): Promise<{ message: string }> {
+  const res = await api.post('/auth/resend-verification', { email })
   return res.data
 }
 

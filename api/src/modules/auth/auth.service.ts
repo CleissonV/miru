@@ -42,22 +42,12 @@ export async function register(data: RegisterBody) {
       id: true,
       email: true,
       username: true,
-      displayName: true,
-      avatar: true,
-      language: true,
-      emailVerified: true,
     },
   })
 
   await sendVerificationEmail(user.id, user.email)
 
-  const payload = { sub: user.id, username: user.username }
-
-  return {
-    user,
-    accessToken: signAccessToken(payload),
-    refreshToken: signRefreshToken(payload),
-  }
+  return { user }
 }
 
 export async function login(data: LoginBody) {
@@ -72,6 +62,13 @@ export async function login(data: LoginBody) {
   // Mesmo erro independente se email existe — evita user enumeration
   if (!user || !passwordMatches) {
     throw ApiError.unauthorized('Credenciais inválidas')
+  }
+
+  if (!user.emailVerified) {
+    throw ApiError.forbidden(
+      'Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.',
+      'EMAIL_NOT_VERIFIED',
+    )
   }
 
   const payload = { sub: user.id, username: user.username }
@@ -122,10 +119,11 @@ export async function verifyEmail(token: string) {
   await redis.del(`verify_email:${token}`)
 }
 
-export async function resendVerification(userId: string) {
-  const user = await db.user.findUnique({ where: { id: userId } })
-  if (!user) throw ApiError.notFound('Usuário não encontrado')
-  if (user.emailVerified) throw ApiError.conflict('E-mail já verificado')
+export async function resendVerification(email: string) {
+  const user = await db.user.findUnique({ where: { email } })
+
+  // Não revela se o e-mail existe nem se já está verificado — evita user enumeration
+  if (!user || user.emailVerified) return
 
   await sendVerificationEmail(user.id, user.email)
 }

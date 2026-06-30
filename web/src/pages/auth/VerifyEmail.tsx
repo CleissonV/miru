@@ -43,10 +43,10 @@ export default function VerifyEmail() {
             <CheckCircle2 size={40} className="mx-auto mb-4 text-green-400" />
             <p className="mb-6 text-text">{t('verify_email_success')}</p>
             <Link
-              to="/"
+              to="/login"
               className="inline-block rounded-xl bg-gradient-purple-pink px-6 py-2.5 text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90"
             >
-              {t('verify_email_go_home')}
+              Ir para o login
             </Link>
           </>
         )}

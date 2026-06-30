@@ -21,14 +21,7 @@ export function useLogin() {
 }
 
 export function useRegister() {
-  const { setAuth } = useAuthStore()
-  const navigate = useNavigate()
-
   return useMutation({
     mutationFn: authApi.register,
-    onSuccess: ({ user, accessToken, refreshToken }) => {
-      setAuth(user, accessToken, refreshToken)
-      navigate('/')
-    },
   })
 }

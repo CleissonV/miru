@@ -5,13 +5,15 @@ import {
 } from 'react-native'
 import { Link, useRouter } from 'expo-router'
 import { useAuthStore } from '@/stores/authStore'
-import { login } from '@/api/auth'
+import { login, resendVerification } from '@/api/auth'
 import { COLORS } from '@/lib/constants'
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [unverified, setUnverified] = useState(false)
+  const [resendSent, setResendSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const setUser = useAuthStore(s => s.setUser)
   const router = useRouter()
@@ -19,16 +21,24 @@ export default function LoginScreen() {
   async function handleLogin() {
     if (!email || !password) { setError('Preencha todos os campos'); return }
     setError('')
+    setUnverified(false)
+    setResendSent(false)
     setLoading(true)
     try {
       const data = await login(email.trim().toLowerCase(), password)
       setUser(data.user)
       router.replace('/(tabs)')
     } catch (e: any) {
-      setError(e?.response?.data?.message ?? 'Erro ao entrar')
+      setError(e?.response?.data?.error ?? 'Erro ao entrar')
+      setUnverified(e?.response?.data?.code === 'EMAIL_NOT_VERIFIED')
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleResend() {
+    await resendVerification(email.trim().toLowerCase())
+    setResendSent(true)
   }
 
   return (
@@ -62,7 +72,20 @@ export default function LoginScreen() {
 
         <Link href="/(auth)/forgot-password" style={s.forgotLink}>Esqueceu a senha?</Link>
 
-        {error ? <Text style={s.error}>{error}</Text> : null}
+        {error ? (
+          <View style={s.errorBox}>
+            <Text style={s.error}>{error}</Text>
+            {unverified && (
+              resendSent ? (
+                <Text style={s.resendSent}>E-mail reenviado! Verifique sua caixa de entrada.</Text>
+              ) : (
+                <Pressable onPress={handleResend}>
+                  <Text style={s.resendLink}>Reenviar e-mail de confirmação</Text>
+                </Pressable>
+              )
+            )}
+          </View>
+        ) : null}
 
         <Pressable style={[s.btn, loading && s.btnDisabled]} onPress={handleLogin} disabled={loading}>
           {loading
@@ -96,7 +119,10 @@ const s = StyleSheet.create({
     marginBottom: 12,
   },
   forgotLink: { color: COLORS.accent, fontSize: 13, fontWeight: '500', textAlign: 'right', marginBottom: 16 },
-  error: { color: COLORS.red, fontSize: 13, marginBottom: 12, textAlign: 'center' },
+  errorBox: { marginBottom: 12, alignItems: 'center' },
+  error: { color: COLORS.red, fontSize: 13, textAlign: 'center' },
+  resendLink: { color: COLORS.red, fontSize: 12, fontWeight: '700', textDecorationLine: 'underline', marginTop: 6 },
+  resendSent: { color: COLORS.green, fontSize: 12, fontWeight: '600', marginTop: 6 },
   btn: {
     backgroundColor: COLORS.accent,
     borderRadius: 12,

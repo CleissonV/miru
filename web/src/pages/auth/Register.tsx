@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Tv } from 'lucide-react'
+import { Tv, MailCheck } from 'lucide-react'
 import { useRegister } from '@/hooks/useAuth'
 
 const INPUT_CLASS =
@@ -22,6 +22,27 @@ export default function Register() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     register.mutate(form)
+  }
+
+  if (register.isSuccess) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="w-full max-w-sm text-center">
+          <MailCheck size={40} className="mx-auto mb-4 text-brand-purple" />
+          <h1 className="text-xl font-bold text-text">Confirme seu e-mail</h1>
+          <p className="mt-2 text-sm text-text-muted">
+            Enviamos um link de confirmação para <strong className="text-text">{form.email}</strong>.
+            Clique nele para ativar sua conta.
+          </p>
+          <Link
+            to="/login"
+            className="mt-6 inline-block rounded-xl bg-gradient-purple-pink px-6 py-2.5 text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90"
+          >
+            Ir para o login
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (

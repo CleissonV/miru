@@ -3,9 +3,9 @@ import { View, Text, Pressable, StyleSheet, ScrollView, Alert, Image, TextInput,
 import { useRouter } from 'expo-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as ImagePicker from 'expo-image-picker'
-import { Globe, Mail, Pencil, Check, X, Camera, KeyRound } from 'lucide-react-native'
+import { Globe, Pencil, Check, X, Camera, KeyRound } from 'lucide-react-native'
 import { useAuthStore, type Language } from '@/stores/authStore'
-import { logout, resendVerification } from '@/api/auth'
+import { logout } from '@/api/auth'
 import { changePassword, uploadAvatar } from '@/api/users'
 import { api } from '@/api/client'
 import { useT } from '@/i18n/translations'
@@ -18,7 +18,6 @@ export default function ProfileScreen() {
   const qc = useQueryClient()
   const t = useT()
 
-  const [verifySent, setVerifySent] = useState(false)
   const [editingName, setEditingName] = useState(false)
   const [nameInput, setNameInput] = useState('')
   const [showPasswordForm, setShowPasswordForm] = useState(false)
@@ -71,11 +70,6 @@ export default function ProfileScreen() {
     },
   })
 
-  const resendMutation = useMutation({
-    mutationFn: resendVerification,
-    onSuccess: () => setVerifySent(true),
-  })
-
   async function handlePickAvatar() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (!permission.granted) return
@@ -122,20 +116,6 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={s.root} contentContainerStyle={s.container}>
-      {!user.emailVerified && (
-        <View style={s.verifyBanner}>
-          <Mail size={14} color={COLORS.yellow} />
-          <Text style={s.verifyText}>{t('verify_banner_text')}</Text>
-          {verifySent ? (
-            <Text style={s.verifySent}>{t('verify_banner_sent')}</Text>
-          ) : (
-            <Pressable onPress={() => resendMutation.mutate()} disabled={resendMutation.isPending}>
-              <Text style={s.verifyResend}>{t('verify_banner_resend')}</Text>
-            </Pressable>
-          )}
-        </View>
-      )}
-
       {/* Avatar */}
       <Pressable style={s.avatarCircle} onPress={handlePickAvatar} disabled={avatarMutation.isPending}>
         {avatarSrc ? (
@@ -284,21 +264,6 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: COLORS.bg },
   container: { padding: 24, alignItems: 'center' },
-  verifyBanner: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: COLORS.yellow + '18',
-    borderWidth: 1,
-    borderColor: COLORS.yellow + '33',
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 16,
-  },
-  verifyText: { flex: 1, color: COLORS.yellow, fontSize: 12 },
-  verifyResend: { color: COLORS.yellow, fontSize: 12, fontWeight: '700' },
-  verifySent: { color: COLORS.green, fontSize: 12, fontWeight: '600' },
   avatarCircle: {
     width: 80,
     height: 80,

@@ -3,8 +3,8 @@ import {
   View, Text, TextInput, Pressable, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native'
-import { Link, useRouter } from 'expo-router'
-import { useAuthStore } from '@/stores/authStore'
+import { Link } from 'expo-router'
+import { Mail } from 'lucide-react-native'
 import { register } from '@/api/auth'
 import { COLORS } from '@/lib/constants'
 
@@ -15,27 +15,38 @@ export default function RegisterScreen() {
   const [displayName, setDisplayName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const setUser = useAuthStore(s => s.setUser)
-  const router = useRouter()
+  const [done, setDone] = useState(false)
 
   async function handleRegister() {
     if (!username || !email || !password) { setError('Preencha os campos obrigatórios'); return }
     setError('')
     setLoading(true)
     try {
-      const data = await register({
+      await register({
         username: username.trim().toLowerCase(),
         email: email.trim().toLowerCase(),
         password,
         displayName: displayName.trim() || undefined,
       })
-      setUser(data.user)
-      router.replace('/(tabs)')
+      setDone(true)
     } catch (e: any) {
-      setError(e?.response?.data?.message ?? 'Erro ao criar conta')
+      setError(e?.response?.data?.error ?? 'Erro ao criar conta')
     } finally {
       setLoading(false)
     }
+  }
+
+  if (done) {
+    return (
+      <View style={[s.root, s.container, { alignItems: 'center' }]}>
+        <Mail size={40} color={COLORS.accent} style={{ marginBottom: 16 }} />
+        <Text style={s.title}>Confirme seu e-mail</Text>
+        <Text style={[s.subtitle, { marginBottom: 24 }]}>
+          Enviamos um link de confirmação para {email}. Clique nele para ativar sua conta.
+        </Text>
+        <Link href="/(auth)/login" style={s.link}>Ir para o login</Link>
+      </View>
+    )
   }
 
   return (
