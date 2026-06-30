@@ -20,5 +20,21 @@ export const refreshSchema = z.object({
   refreshToken: z.string().min(1),
 })
 
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1),
+})
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Email inválido'),
+})
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email('Email inválido'),
+  code: z.string().length(6, 'Código deve ter 6 dígitos'),
+  newPassword: z.string().min(6, 'Mínimo 6 caracteres'),
+})
+
 export type RegisterBody = z.infer<typeof registerSchema>
 export type LoginBody = z.infer<typeof loginSchema>
+export type ForgotPasswordBody = z.infer<typeof forgotPasswordSchema>
+export type ResetPasswordBody = z.infer<typeof resetPasswordSchema>

@@ -34,6 +34,7 @@ model User {
   avatar       String?
   isPublic     Boolean  @default(true) @map("is_public")
   language     String   @default("pt-BR")
+  emailVerified Boolean @default(false) @map("email_verified")
   entries      Entry[]
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")

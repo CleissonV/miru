@@ -1,3 +1,4 @@
+import path from 'path'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -13,7 +14,7 @@ import userRoutes from './modules/users/user.routes'
 
 export const app = express()
 
-app.use(helmet())
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 const ALLOWED_ORIGINS = [
   env.CLIENT_URL,
   'http://localhost:8081', // Expo web
@@ -39,6 +40,8 @@ const limiter = rateLimit({
 })
 
 app.use('/api', limiter)
+
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')))
 
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }))
 

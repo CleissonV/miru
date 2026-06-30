@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import { db } from '../../db/prisma'
 import { ApiError } from '../../utils/apiError'
 
@@ -50,6 +51,38 @@ export async function updateProfile(
   return db.user.update({
     where: { id: userId },
     data,
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      displayName: true,
+      avatar: true,
+      bio: true,
+      isPublic: true,
+      language: true,
+    },
+  })
+}
+
+export async function changePassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+) {
+  const user = await db.user.findUnique({ where: { id: userId } })
+  if (!user) throw ApiError.notFound('Usuário não encontrado')
+
+  const matches = await bcrypt.compare(currentPassword, user.passwordHash)
+  if (!matches) throw ApiError.unauthorized('Senha atual incorreta')
+
+  const passwordHash = await bcrypt.hash(newPassword, 10)
+  await db.user.update({ where: { id: userId }, data: { passwordHash } })
+}
+
+export async function updateAvatar(userId: string, avatarUrl: string) {
+  return db.user.update({
+    where: { id: userId },
+    data: { avatar: avatarUrl },
     select: {
       id: true,
       email: true,

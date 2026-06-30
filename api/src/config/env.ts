@@ -12,6 +12,8 @@ const schema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   TMDB_API_KEY: z.string().default(''),
   CLIENT_URL: z.string().default('http://localhost:5173'),
+  RESEND_API_KEY: z.string().default(''),
+  EMAIL_FROM: z.string().default('Miru <onboarding@resend.dev>'),
 })
 
 const result = schema.safeParse(process.env)

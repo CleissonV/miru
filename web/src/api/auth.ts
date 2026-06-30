@@ -29,3 +29,27 @@ export async function getMe(): Promise<User> {
   const res = await api.get<User>('/auth/me')
   return res.data
 }
+
+export async function verifyEmail(token: string): Promise<{ message: string }> {
+  const res = await api.get('/auth/verify-email', { params: { token } })
+  return res.data
+}
+
+export async function resendVerification(): Promise<{ message: string }> {
+  const res = await api.post('/auth/resend-verification')
+  return res.data
+}
+
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  const res = await api.post('/auth/forgot-password', { email })
+  return res.data
+}
+
+export async function resetPassword(data: {
+  email: string
+  code: string
+  newPassword: string
+}): Promise<{ message: string }> {
+  const res = await api.post('/auth/reset-password', data)
+  return res.data
+}

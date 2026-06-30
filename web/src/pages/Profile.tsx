@@ -1,7 +1,9 @@
+import { useState, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Globe } from 'lucide-react'
+import { Globe, Pencil, Check, X, Camera, KeyRound, Loader2 } from 'lucide-react'
 import { api } from '@/api/client'
+import { changePassword, uploadAvatar } from '@/api/users'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Badge } from '@/components/ui/Badge'
 import { getInitials } from '@/lib/utils'
@@ -20,6 +22,20 @@ export default function Profile() {
   const STATUS_LABEL = useStatusLabel()
   const MEDIA_LABEL = useMediaLabel()
 
+  const [editingName, setEditingName] = useState(false)
+  const [nameInput, setNameInput] = useState('')
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [passwordMsg, setPasswordMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const invalidateMediaQueries = () => {
+    qc.invalidateQueries({ queryKey: ['trending'] })
+    qc.invalidateQueries({ queryKey: ['media'] })
+    qc.invalidateQueries({ queryKey: ['search'] })
+  }
+
   const updateLanguage = useMutation({
     mutationFn: async (language: Language) => {
       const res = await api.patch('/users/me', { language })
@@ -27,11 +43,57 @@ export default function Profile() {
     },
     onSuccess: (updated) => {
       setUser(updated)
-      qc.invalidateQueries({ queryKey: ['trending'] })
-      qc.invalidateQueries({ queryKey: ['media'] })
-      qc.invalidateQueries({ queryKey: ['search'] })
+      invalidateMediaQueries()
     },
   })
+
+  const updateName = useMutation({
+    mutationFn: async (displayName: string) => {
+      const res = await api.patch('/users/me', { displayName })
+      return res.data
+    },
+    onSuccess: (updated) => {
+      setUser(updated)
+      qc.invalidateQueries({ queryKey: ['profile', username] })
+      setEditingName(false)
+    },
+  })
+
+  const avatarMutation = useMutation({
+    mutationFn: uploadAvatar,
+    onSuccess: (updated) => {
+      setUser(updated)
+      qc.invalidateQueries({ queryKey: ['profile', username] })
+    },
+  })
+
+  const passwordMutation = useMutation({
+    mutationFn: changePassword,
+    onSuccess: () => {
+      setPasswordMsg({ type: 'ok', text: t('profile_password_changed') })
+      setCurrentPassword('')
+      setNewPassword('')
+    },
+    onError: (err: any) => {
+      setPasswordMsg({ type: 'err', text: err?.response?.data?.error ?? 'Erro' })
+    },
+  })
+
+  function handleAvatarClick() {
+    fileInputRef.current?.click()
+  }
+
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) avatarMutation.mutate(file)
+    e.target.value = ''
+  }
+
+  function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setPasswordMsg(null)
+    passwordMutation.mutate({ currentPassword, newPassword })
+  }
 
   const { data: profile, isLoading: loadingProfile, error } = useQuery({
     queryKey: ['profile', username],
@@ -71,7 +133,7 @@ export default function Profile() {
       {/* Header */}
       <div className="mb-10 flex items-start gap-6">
         <div className="relative h-20 w-20 shrink-0">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-purple-pink text-2xl font-bold text-white shadow-glow">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-purple-pink text-2xl font-bold text-white shadow-glow overflow-hidden">
             {profile.avatar ? (
               <img
                 src={profile.avatar}
@@ -84,12 +146,69 @@ export default function Profile() {
           </div>
           {/* Online indicator */}
           <span className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-bg bg-green-400" />
+
+          {isOwnProfile && (
+            <>
+              <button
+                onClick={handleAvatarClick}
+                disabled={avatarMutation.isPending}
+                title={t('profile_change_avatar')}
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/0 text-white opacity-0 transition-opacity hover:bg-black/50 hover:opacity-100"
+              >
+                {avatarMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+            </>
+          )}
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold text-text">
-            {profile.displayName ?? profile.username}
-          </h1>
+          {isOwnProfile && editingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                maxLength={50}
+                className="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-xl font-bold text-text outline-none focus:border-brand-purple"
+              />
+              <button
+                onClick={() => nameInput.trim() && updateName.mutate(nameInput.trim())}
+                disabled={updateName.isPending}
+                className="rounded-lg bg-green-500/15 p-1.5 text-green-400 hover:bg-green-500/25"
+              >
+                <Check size={15} />
+              </button>
+              <button
+                onClick={() => setEditingName(false)}
+                className="rounded-lg bg-surface-2 p-1.5 text-text-muted hover:bg-surface-3"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          ) : (
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-text">
+              {profile.displayName ?? profile.username}
+              {isOwnProfile && (
+                <button
+                  onClick={() => {
+                    setNameInput(profile.displayName ?? profile.username)
+                    setEditingName(true)
+                  }}
+                  className="text-text-subtle hover:text-brand-purple"
+                  title={t('profile_edit_name')}
+                >
+                  <Pencil size={14} />
+                </button>
+              )}
+            </h1>
+          )}
           <p className="text-sm text-text-muted">@{profile.username}</p>
           {profile.bio && (
             <p className="mt-2 max-w-md text-sm text-text-muted">{profile.bio}</p>
@@ -136,6 +255,53 @@ export default function Profile() {
           <p className="mt-2.5 text-xs text-text-subtle">
             {t('profile_language_hint')}
           </p>
+        </div>
+      )}
+
+      {/* Change password (own profile only) */}
+      {isOwnProfile && (
+        <div className="mb-10 rounded-2xl border border-border bg-surface p-4">
+          <button
+            onClick={() => setShowPasswordForm(v => !v)}
+            className="flex w-full items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-text-muted"
+          >
+            <KeyRound size={12} />
+            {t('profile_change_password')}
+          </button>
+
+          {showPasswordForm && (
+            <form onSubmit={handlePasswordSubmit} className="mt-3 space-y-2.5">
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
+                placeholder={t('profile_current_password')}
+                required
+                className="w-full rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-sm text-text placeholder-text-muted outline-none transition-colors focus:border-brand-purple"
+              />
+              <input
+                type="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                placeholder={t('profile_new_password')}
+                minLength={6}
+                required
+                className="w-full rounded-xl border border-border bg-surface-2 px-3.5 py-2 text-sm text-text placeholder-text-muted outline-none transition-colors focus:border-brand-purple"
+              />
+              {passwordMsg && (
+                <p className={cn('text-xs', passwordMsg.type === 'ok' ? 'text-green-400' : 'text-red-400')}>
+                  {passwordMsg.text}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={passwordMutation.isPending}
+                className="rounded-xl bg-gradient-purple-pink px-4 py-2 text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                {t('profile_save')}
+              </button>
+            </form>
+          )}
         </div>
       )}
 

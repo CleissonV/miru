@@ -18,6 +18,7 @@ export interface User {
   bio: string | null
   isPublic: boolean
   language: Language
+  emailVerified: boolean
   createdAt: string
 }
 
