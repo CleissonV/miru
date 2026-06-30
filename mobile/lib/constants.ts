@@ -2,9 +2,9 @@ import { Platform } from 'react-native'
 
 export const API_URL = __DEV__
   ? Platform.OS === 'android'
-    ? 'http://10.0.2.2:3333'
-    : 'http://localhost:3333'
-  : 'https://api.miru.app'
+    ? 'http://10.0.2.2:3333/api'
+    : 'http://localhost:3333/api'
+  : 'https://api.miru.app/api'
 
 export const COLORS = {
   bg: '#09090b',

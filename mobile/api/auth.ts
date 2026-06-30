@@ -1,5 +1,5 @@
 import { api } from './client'
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from '@/lib/secureStorage'
 
 interface AuthResponse {
   user: { id: string; username: string; email: string; displayName: string | null; avatar: string | null }

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from '@/lib/secureStorage'
 import { API_URL } from '@/lib/constants'
 
 export const api = axios.create({

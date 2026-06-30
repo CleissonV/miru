@@ -9,6 +9,11 @@
 [![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Licença](https://img.shields.io/badge/licen%C3%A7a-All%20Rights%20Reserved-red?style=flat-square)]()
+
+> ⚠️ **Código proprietário** — disponível para visualização e avaliação. Uso, cópia ou distribuição não autorizados são proibidos. Veja [LICENSE](./LICENSE).
+> 
+> ⚠️ **Proprietary code** — available for viewing and evaluation only. Unauthorized use, copying, or distribution is prohibited. See [LICENSE](./LICENSE).
 
 [🇧🇷 Português](#-português) · [🇺🇸 English](#-english)
 
@@ -255,9 +260,13 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ---
 
-## License
+## Licença / License
 
-MIT
+© 2026 Cleisson Vilela — **All Rights Reserved**
+
+Código disponível para visualização e avaliação de recrutadores. Uso comercial, cópia ou distribuição proibidos sem autorização. Veja [LICENSE](./LICENSE) para detalhes.
+
+Code available for viewing and recruiter evaluation. Commercial use, copying, or distribution prohibited without authorization. See [LICENSE](./LICENSE) for details.
 
 ---
 

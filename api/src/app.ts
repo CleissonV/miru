@@ -14,7 +14,19 @@ import userRoutes from './modules/users/user.routes'
 export const app = express()
 
 app.use(helmet())
-app.use(cors({ origin: env.CLIENT_URL, credentials: true }))
+const ALLOWED_ORIGINS = [
+  env.CLIENT_URL,
+  'http://localhost:8081', // Expo web
+  'http://10.0.2.2:8081', // Android emulator
+]
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true)
+    cb(new Error('Not allowed by CORS'))
+  },
+  credentials: true,
+}))
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 app.use(express.json({ limit: '10kb' }))
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { View, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
-import * as SecureStore from 'expo-secure-store'
+import * as SecureStore from '@/lib/secureStorage'
 import { useAuthStore } from '@/stores/authStore'
 import { api } from '@/api/client'
 import { COLORS } from '@/lib/constants'
