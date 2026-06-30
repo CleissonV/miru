@@ -2,7 +2,7 @@
 
 # 見 Miru
 
-### Track everything you watch — movies, series, anime & K-dramas
+### Acompanhe tudo que você assiste — filmes, séries, animes e doramas
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
@@ -10,152 +10,143 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma&logoColor=white)](https://www.prisma.io/)
 
+[🇧🇷 Português](#-português) · [🇺🇸 English](#-english)
+
 </div>
 
 ---
 
-## What is Miru?
+## 🇧🇷 Português
 
-**Miru** (見 — "to watch/see" in Japanese) is a full-stack media tracker inspired by MyAnimeList, built entirely from scratch. It lets you organize and rate everything you consume: **films, TV series, anime, and K-dramas**, in one clean interface.
+### O que é o Miru?
 
-> I built this project to deepen my full-stack TypeScript skills — designing a real REST API, handling auth properly with JWT refresh tokens, integrating external APIs, and building a polished UI from the ground up without relying on component libraries.
+**Miru** (見 — "ver/assistir" em japonês) é um rastreador de mídia full-stack inspirado no MyAnimeList, construído do zero. Permite organizar e avaliar tudo que você consome: **filmes, séries, animes e doramas (K-dramas)**, em um só lugar.
 
----
+> Construí esse projeto para aprofundar minhas habilidades em TypeScript full-stack — projetar uma API REST real, implementar autenticação correta com refresh tokens JWT, integrar APIs externas e construir uma UI polida sem depender de bibliotecas de componentes prontas.
 
-## Features
+### Funcionalidades
 
-- **Media tracking** — add titles to your list with status (Watching, Completed, Plan to Watch, On Hold, Dropped) and a 1–10 rating
-- **Four categories** — Movies, Series, Anime (via Jikan/MAL), K-Dramas (via TMDB)
-- **Trending & discovery** — curated trending rows for each category on the home page
-- **Full-text search** — search any title across all categories simultaneously
-- **Auth system** — email/password registration with JWT access tokens (15 min) + refresh tokens (7 days, stored in Redis)
-- **Statistics page** — personal watch stats broken down by type, status, and average rating
-- **Dark / light mode** — system-aware with manual toggle
-- **Caching layer** — Redis caches TMDB and Jikan API responses (24 h TTL) to minimize external calls
-- **Responsive layout** — sidebar nav that collapses gracefully on smaller screens
+- **Rastreamento de mídia** — adicione títulos à sua lista com status (Assistindo, Concluído, Quero Assistir, Em Pausa, Abandonado) e nota de 1 a 10
+- **Quatro categorias** — Filmes, Séries, Animes (via Jikan/MAL) e Doramas (via TMDB)
+- **Tendências e descoberta** — seções de trending para cada categoria na página inicial
+- **Busca** — pesquise qualquer título em todas as categorias ao mesmo tempo
+- **Autenticação completa** — cadastro com email/senha, tokens de acesso JWT (15 min) + refresh tokens (7 dias, armazenados no Redis)
+- **Estatísticas** — dados pessoais de consumo por tipo, status e nota média
+- **Modo escuro / claro** — detecta preferência do sistema com toggle manual
+- **Cache com Redis** — respostas da TMDB e Jikan são cacheadas por 24h para minimizar chamadas externas
+- **Layout responsivo** — sidebar recolhível em telas menores
 
----
+### Stack
 
-## Tech Stack
-
-### Frontend (`/web`)
+#### Frontend (`/web`)
 
 | | |
 |---|---|
-| **React 18** + **TypeScript** | Core framework |
-| **Vite** | Dev server + bundler |
-| **Tailwind CSS v3** | Utility-first styling with custom design tokens |
-| **TanStack Query v5** | Server-state management, caching, background refetching |
-| **Zustand v4** | Auth client-state (user, tokens) |
-| **Framer Motion** | Page transitions and card animations |
-| **React Router v6** | Client-side routing with protected routes |
-| **Lucide React** | Icon set |
+| **React 18** + **TypeScript** | Framework principal |
+| **Vite** | Dev server e bundler |
+| **Tailwind CSS v3** | Estilização com tokens de design customizados |
+| **TanStack Query v5** | Gerenciamento de estado do servidor, cache e refetch |
+| **Zustand v4** | Estado de autenticação no cliente |
+| **Framer Motion** | Animações e transições |
+| **React Router v6** | Roteamento com rotas protegidas |
+| **Lucide React** | Ícones |
 
-### Backend (`/api`)
-
-| | |
-|---|---|
-| **Node.js** + **Express** | HTTP server |
-| **TypeScript** + **tsx watch** | Type-safe dev with hot reload |
-| **Prisma ORM** | Type-safe database access |
-| **PostgreSQL 16** | Primary database (via Docker) |
-| **Redis** | JWT refresh token store + API response cache |
-| **bcryptjs** | Password hashing |
-| **jsonwebtoken** | JWT signing and verification |
-| **Axios** | TMDB + Jikan API clients |
-| **Zod** | Request validation |
-
-### Infrastructure
+#### Backend (`/api`)
 
 | | |
 |---|---|
-| **Docker Compose** | PostgreSQL + Redis containers |
-| **TMDB API** | Movie, series, and K-drama metadata |
-| **Jikan API** | Anime metadata (MyAnimeList data, no key required) |
+| **Node.js** + **Express** | Servidor HTTP |
+| **TypeScript** + **tsx watch** | Tipagem estática com hot reload |
+| **Prisma ORM** | Acesso ao banco com tipagem completa |
+| **PostgreSQL 16** | Banco de dados principal (via Docker) |
+| **Redis** | Store de refresh tokens + cache de respostas de API |
+| **bcryptjs** | Hash de senhas |
+| **jsonwebtoken** | Assinatura e verificação de JWT |
+| **Axios** | Clientes das APIs TMDB e Jikan |
+| **Zod** | Validação de requisições |
 
----
+#### Infraestrutura
 
-## Architecture
+| | |
+|---|---|
+| **Docker Compose** | Containers de PostgreSQL e Redis |
+| **TMDB API** | Metadados de filmes, séries e doramas |
+| **Jikan API** | Metadados de anime (dados do MyAnimeList, sem chave) |
+
+### Arquitetura
 
 ```
 miru/
-├── api/                    # Node.js + Express REST API
+├── api/                    # API REST Node.js + Express
 │   ├── prisma/
-│   │   └── schema.prisma   # Database schema (User, Entry, MediaCache)
+│   │   └── schema.prisma   # Schema do banco (User, Entry, MediaCache)
 │   └── src/
 │       ├── modules/
-│       │   ├── auth/       # Register, login, refresh token
-│       │   ├── entries/    # CRUD for watch list entries
-│       │   ├── media/      # Trending, detail (TMDB + Jikan providers)
-│       │   ├── search/     # Cross-category search
-│       │   └── users/      # Profile management
-│       ├── middleware/     # JWT auth, global error handler
-│       ├── lib/            # Redis client
-│       └── utils/          # ApiError, asyncHandler, JWT helpers
+│       │   ├── auth/       # Registro, login, refresh token
+│       │   ├── entries/    # CRUD da lista de acompanhamento
+│       │   ├── media/      # Trending, detalhes (providers TMDB + Jikan)
+│       │   ├── search/     # Busca entre categorias
+│       │   └── users/      # Gerenciamento de perfil
+│       ├── middleware/     # Auth JWT, tratamento global de erros
+│       ├── lib/            # Cliente Redis
+│       └── utils/          # ApiError, asyncHandler, helpers JWT
 │
-└── web/                    # React + Vite SPA
+└── web/                    # SPA React + Vite
     └── src/
-        ├── api/            # Typed API client functions
-        ├── components/     # MediaCard, Sidebar, Navbar, UI primitives
-        ├── pages/          # Home, Search, List, MediaDetail, Stats, Auth
-        ├── stores/         # Zustand auth store
+        ├── api/            # Funções tipadas de acesso à API
+        ├── components/     # MediaCard, Sidebar, Navbar, primitivos UI
+        ├── pages/          # Home, Busca, Lista, Detalhe, Stats, Auth
+        ├── stores/         # Zustand — estado de autenticação
         ├── hooks/          # useAuth, useDebounce
-        └── types/          # Shared TS types
+        └── types/          # Tipos TypeScript compartilhados
 ```
 
-### Data flow
+### Fluxo de dados
 
 ```
 Browser → Vite proxy (/api) → Express API → Prisma → PostgreSQL
-                                          ↘ Redis (cache/tokens)
-                                          ↘ TMDB API
-                                          ↘ Jikan API
+                                           ↘ Redis (cache/tokens)
+                                           ↘ TMDB API
+                                           ↘ Jikan API
 ```
 
----
+### Como rodar
 
-## Getting Started
-
-### Prerequisites
+#### Pré-requisitos
 
 - Node.js 20+
 - Docker + Docker Compose
-- A free [TMDB API key](https://www.themoviedb.org/settings/api)
+- [Chave de API TMDB](https://www.themoviedb.org/settings/api) (gratuita)
 
-### 1. Clone and install
+#### 1. Clonar e instalar
 
 ```bash
 git clone https://github.com/CleissonV/miru.git
 cd miru
 
-# Install API deps
 cd api && npm install
-
-# Install web deps
 cd ../web && npm install
 ```
 
-### 2. Configure environment
+#### 2. Configurar variáveis de ambiente
 
 ```bash
-# From project root
 cp .env.example .env
 ```
 
-Edit `.env` and fill in:
-- `TMDB_API_KEY` — get one free at themoviedb.org
-- `JWT_SECRET` and `JWT_REFRESH_SECRET` — use long random strings in production
+Edite o `.env` e preencha:
+- `TMDB_API_KEY` — obtenha gratuitamente em themoviedb.org
+- `JWT_SECRET` e `JWT_REFRESH_SECRET` — strings longas e aleatórias
 
-### 3. Start infrastructure
+#### 3. Subir infraestrutura
 
 ```bash
-# From project root
 docker compose up -d
 ```
 
-This starts PostgreSQL (port 5432) and Redis (port 6379).
+Inicia PostgreSQL (porta 5432) e Redis (porta 6379).
 
-### 4. Run database migrations
+#### 4. Rodar migrations
 
 ```bash
 cd api
@@ -163,21 +154,71 @@ npx prisma db push
 npx prisma generate
 ```
 
-### 5. Start the servers
+#### 5. Iniciar os servidores
 
 ```bash
-# Terminal 1 — API (port 3333)
+# Terminal 1 — API (porta 3333)
 cd api && npm run dev
 
-# Terminal 2 — Web (port 5173)
+# Terminal 2 — Web (porta 5173)
 cd web && npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) and create an account.
+Acesse [http://localhost:5173](http://localhost:5173) e crie uma conta.
+
+### Decisões técnicas
+
+**Por que construir do zero em vez de usar Next.js/tRPC/etc.?**
+Queria visibilidade total em cada camada — roteamento, autenticação, cache e design de API. Usar um meta-framework abstrairia exatamente as partes que queria aprender.
+
+**Por que Jikan para anime em vez de TMDB?**
+O Jikan serve dados do MyAnimeList, que tem cobertura de anime muito superior — melhores avaliações da comunidade, contagem de episódios e catalogação. Não requer chave de API.
+
+**Por que tokens de acesso + refresh separados?**
+Tokens de curta duração (15 min) limitam o impacto de um token comprometido. Refresh tokens ficam no Redis e podem ser revogados imediatamente no logout — algo impossível com JWTs puramente stateless.
+
+**Por que Redis para cache de API?**
+A TMDB limita em 40 req/s. Com cache Redis de 24h, um título popular acessa a API externa apenas uma vez por dia, independente de quantos usuários o buscam.
+
+### Roadmap
+
+- [ ] App mobile (React Native — scaffoldado em `/mobile`)
+- [ ] Perfis públicos — compartilhe sua lista
+- [ ] Recomendações baseadas no histórico
+- [ ] Rastreamento de episódios para séries e animes
+- [ ] Importar de MyAnimeList / Trakt
 
 ---
 
-## API Overview
+## 🇺🇸 English
+
+### What is Miru?
+
+**Miru** (見 — "to watch/see" in Japanese) is a full-stack media tracker inspired by MyAnimeList, built from scratch. It lets you organize and rate everything you consume: **films, TV series, anime, and K-dramas**, in one place.
+
+> I built this to deepen my full-stack TypeScript skills — designing a real REST API, handling auth properly with JWT refresh tokens, integrating external APIs, and building a polished UI without relying on component libraries.
+
+### Features
+
+- **Media tracking** — add titles with status (Watching, Completed, Plan to Watch, On Hold, Dropped) and a 1–10 rating
+- **Four categories** — Movies, Series, Anime (via Jikan/MAL), K-Dramas (via TMDB)
+- **Trending & discovery** — curated trending rows for each category on the home page
+- **Full-text search** — search any title across all categories simultaneously
+- **Auth system** — email/password registration, JWT access tokens (15 min) + refresh tokens (7 days in Redis)
+- **Statistics page** — personal watch stats by type, status, and average rating
+- **Dark / light mode** — system-aware with manual toggle
+- **Redis caching** — TMDB and Jikan API responses cached for 24h
+- **Responsive layout** — collapsible sidebar navigation
+
+### Tech Stack
+
+**Frontend:** React 18 · TypeScript · Vite · Tailwind CSS v3 · TanStack Query v5 · Zustand · Framer Motion · React Router v6
+
+**Backend:** Node.js · Express · TypeScript · Prisma ORM · PostgreSQL 16 · Redis · bcryptjs · jsonwebtoken · Axios · Zod
+
+**Infrastructure:** Docker Compose · TMDB API · Jikan API
+
+### API Overview
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
@@ -185,42 +226,32 @@ Open [http://localhost:5173](http://localhost:5173) and create an account.
 | POST | `/api/auth/login` | — | Login, receive tokens |
 | POST | `/api/auth/refresh` | — | Rotate refresh token |
 | POST | `/api/auth/logout` | ✓ | Revoke refresh token |
-| GET | `/api/media/trending` | — | Trending movies/series/anime/doramas |
+| GET | `/api/media/trending` | — | Trending per category |
 | GET | `/api/media/:type/:id` | — | Media detail |
-| GET | `/api/search?q=&type=` | — | Search across categories |
-| GET | `/api/entries` | ✓ | Get user's watch list |
-| POST | `/api/entries` | ✓ | Add title to list |
+| GET | `/api/search?q=&type=` | — | Cross-category search |
+| GET | `/api/entries` | ✓ | User's watch list |
+| POST | `/api/entries` | ✓ | Add to list |
 | PATCH | `/api/entries/:id` | ✓ | Update status/rating |
 | DELETE | `/api/entries/:id` | ✓ | Remove from list |
 | GET | `/api/entries/stats` | ✓ | Personal statistics |
 | GET | `/api/users/me` | ✓ | Own profile |
 | PATCH | `/api/users/me` | ✓ | Update profile |
 
----
+### Getting Started
 
-## Design Decisions
+```bash
+git clone https://github.com/CleissonV/miru.git
+cd miru
 
-**Why build from scratch instead of using Next.js/tRPC/etc.?**
-I wanted full visibility into every layer — routing, auth, caching, API design. Using a full-stack meta-framework would abstract away the parts I wanted to learn.
+cp .env.example .env   # fill in TMDB_API_KEY and JWT secrets
 
-**Why Jikan for anime instead of TMDB?**
-Jikan proxies MyAnimeList data, which has far better anime coverage, community ratings, and episode counts than TMDB. No API key required.
+docker compose up -d   # PostgreSQL + Redis
 
-**Why separate access + refresh tokens?**
-Short-lived access tokens (15 min) limit the blast radius of a stolen token. Refresh tokens are stored in Redis so they can be revoked immediately on logout — something you can't do with stateless JWTs alone.
+cd api && npm install && npx prisma db push && npx prisma generate && npm run dev
+cd ../web && npm install && npm run dev
+```
 
-**Why Redis for API cache?**
-TMDB rate-limits at 40 req/s. With Redis caching trending/detail responses for 24 hours, a popular title only hits the external API once per day regardless of how many users request it.
-
----
-
-## Roadmap
-
-- [ ] Mobile app (React Native — scaffolded in `/mobile`)
-- [ ] Public profiles — share your list with others
-- [ ] Recommendations based on your history
-- [ ] Episode tracking for series and anime
-- [ ] Import from MyAnimeList / Trakt
+Open [http://localhost:5173](http://localhost:5173).
 
 ---
 
@@ -232,6 +263,6 @@ MIT
 
 <div align="center">
 
-Built by [Cleisson Vilela](https://github.com/CleissonV) · [cleissonsilva1@hotmail.com](mailto:cleissonsilva1@hotmail.com)
+Desenvolvido por / Built by [Cleisson Vilela](https://github.com/CleissonV)
 
 </div>
