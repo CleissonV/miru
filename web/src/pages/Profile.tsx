@@ -156,7 +156,7 @@ export default function Profile() {
         <div className="absolute inset-0 bg-gradient-to-t from-bg/70 via-transparent to-transparent" />
       </div>
 
-      <div className="px-8">
+      <div className="mx-auto max-w-5xl px-8">
         {/* Avatar — overlaps the banner on its own, name block stays clear of it */}
         <div className="relative -mt-12 h-24 w-24 shrink-0">
           <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-bg bg-gradient-purple-pink text-2xl font-bold text-white shadow-glow">
