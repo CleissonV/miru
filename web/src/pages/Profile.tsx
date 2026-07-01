@@ -148,10 +148,10 @@ export default function Profile() {
 
   return (
     <main className="pb-16">
-      {/* Hero banner — drop an image at web/public/profile-banner.jpg to customize */}
+      {/* Hero banner — drop an image at web/public/profile-banner.png to customize */}
       <div
         className="relative h-36 overflow-hidden bg-surface bg-cover bg-center sm:h-44"
-        style={{ backgroundImage: "url('/profile-banner.jpg')" }}
+        style={{ backgroundImage: "url('/profile-banner.png')" }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-bg/70 via-transparent to-transparent" />
       </div>
