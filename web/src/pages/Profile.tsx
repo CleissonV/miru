@@ -148,92 +148,97 @@ export default function Profile() {
 
   return (
     <main className="pb-16">
-      {/* Hero banner */}
-      <div className="relative h-36 overflow-hidden bg-gradient-to-br from-brand-purple/25 via-brand-pink/15 to-transparent sm:h-44">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(129,140,248,0.25),transparent_60%)]" />
+      {/* Hero banner — drop an image at web/public/profile-banner.jpg to customize */}
+      <div
+        className="relative h-36 overflow-hidden bg-surface bg-cover bg-center sm:h-44"
+        style={{ backgroundImage: "url('/profile-banner.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-bg/70 via-transparent to-transparent" />
       </div>
 
       <div className="px-8">
-        {/* Header */}
-        <div className="-mt-12 flex flex-col gap-6 sm:flex-row sm:items-end">
-          <div className="relative h-24 w-24 shrink-0">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-bg bg-gradient-purple-pink text-2xl font-bold text-white shadow-glow">
-              {profile.avatar ? (
-                <img
-                  src={profile.avatar}
-                  alt={profile.username}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                getInitials(profile.displayName ?? profile.username)
-              )}
-            </div>
-            <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full border-2 border-bg bg-green-400" />
-
-            {isOwnProfile && (
-              <>
-                <button
-                  onClick={handleAvatarClick}
-                  disabled={avatarMutation.isPending}
-                  title={t('profile_change_avatar')}
-                  className="absolute inset-0 flex items-center justify-center rounded-full bg-black/0 text-white opacity-0 transition-opacity hover:bg-black/50 hover:opacity-100"
-                >
-                  {avatarMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-              </>
-            )}
-          </div>
-
-          <div className="flex-1 pb-1">
-            {isOwnProfile && editingName ? (
-              <div className="flex items-center gap-2">
-                <input
-                  autoFocus
-                  value={nameInput}
-                  onChange={e => setNameInput(e.target.value)}
-                  maxLength={50}
-                  className="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-xl font-bold text-text outline-none focus:border-brand-purple"
-                />
-                <button
-                  onClick={() => nameInput.trim() && updateName.mutate(nameInput.trim())}
-                  disabled={updateName.isPending}
-                  className="rounded-lg bg-green-500/15 p-1.5 text-green-400 hover:bg-green-500/25"
-                >
-                  <Check size={15} />
-                </button>
-                <button
-                  onClick={() => setEditingName(false)}
-                  className="rounded-lg bg-surface-2 p-1.5 text-text-muted hover:bg-surface-3"
-                >
-                  <X size={15} />
-                </button>
-              </div>
+        {/* Avatar — overlaps the banner on its own, name block stays clear of it */}
+        <div className="relative -mt-12 h-24 w-24 shrink-0">
+          <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-bg bg-gradient-purple-pink text-2xl font-bold text-white shadow-glow">
+            {profile.avatar ? (
+              <img
+                src={profile.avatar}
+                alt={profile.username}
+                className="h-full w-full object-cover"
+              />
             ) : (
-              <h1 className="group flex items-center gap-2 text-2xl font-bold text-text">
-                {profile.displayName ?? profile.username}
-                {isOwnProfile && (
-                  <button
-                    onClick={() => {
-                      setNameInput(profile.displayName ?? profile.username)
-                      setEditingName(true)
-                    }}
-                    className="text-text-subtle opacity-0 transition-opacity hover:text-brand-purple group-hover:opacity-100"
-                    title={t('profile_edit_name')}
-                  >
-                    <Pencil size={14} />
-                  </button>
-                )}
-              </h1>
+              getInitials(profile.displayName ?? profile.username)
             )}
-            <p className="text-sm text-text-muted">@{profile.username}</p>
           </div>
+          <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full border-2 border-bg bg-green-400" />
+
+          {isOwnProfile && (
+            <>
+              <button
+                onClick={handleAvatarClick}
+                disabled={avatarMutation.isPending}
+                title={t('profile_change_avatar')}
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/0 text-white opacity-0 transition-opacity hover:bg-black/50 hover:opacity-100"
+              >
+                {avatarMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+            </>
+          )}
+        </div>
+
+        {/* Header */}
+        <div className="mt-4">
+          {isOwnProfile && editingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                maxLength={50}
+                className="rounded-lg border border-border bg-surface-2 px-2.5 py-1 text-xl font-bold text-text outline-none focus:border-brand-purple"
+              />
+              <button
+                onClick={() => nameInput.trim() && updateName.mutate(nameInput.trim())}
+                disabled={updateName.isPending}
+                className="rounded-lg bg-green-500/15 p-1.5 text-green-400 hover:bg-green-500/25"
+              >
+                <Check size={15} />
+              </button>
+              <button
+                onClick={() => setEditingName(false)}
+                className="rounded-lg bg-surface-2 p-1.5 text-text-muted hover:bg-surface-3"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          ) : (
+            <h1 className="group flex items-center gap-2 text-2xl font-bold text-text">
+              {profile.displayName ?? profile.username}
+              {isOwnProfile && (
+                <button
+                  onClick={() => {
+                    setNameInput(profile.displayName ?? profile.username)
+                    setEditingName(true)
+                  }}
+                  className="text-text-subtle opacity-0 transition-opacity hover:text-brand-purple group-hover:opacity-100"
+                  title={t('profile_edit_name')}
+                >
+                  <Pencil size={14} />
+                </button>
+              )}
+            </h1>
+          )}
+          <p className="text-sm text-text-muted">@{profile.username}</p>
+          {isOwnProfile && loggedUser?.email && (
+            <p className="mt-0.5 text-xs text-text-subtle">{loggedUser.email}</p>
+          )}
         </div>
 
         {profile.bio && (
